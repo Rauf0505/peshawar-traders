@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "peshawar" },
+      { name: "description", content: "Apex Outfitters is a premium eCommerce frontend for hunting and outdoor gear." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "peshawar" },
+      { property: "og:description", content: "Apex Outfitters is a premium eCommerce frontend for hunting and outdoor gear." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "peshawar" },
+      { name: "twitter:description", content: "Apex Outfitters is a premium eCommerce frontend for hunting and outdoor gear." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bb79167a-61fc-4cdc-a16b-093709cbeaae/id-preview-353b962a--1d6c86dd-51f4-430c-864c-6c296ab864b6.lovable.app-1780897016571.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bb79167a-61fc-4cdc-a16b-093709cbeaae/id-preview-353b962a--1d6c86dd-51f4-430c-864c-6c296ab864b6.lovable.app-1780897016571.png" },
     ],
     links: [
       {

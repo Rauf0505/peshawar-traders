@@ -12,7 +12,10 @@ export function Brands() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-8 gap-y-10 items-center">
             {brands.map((b) => (
-              <div key={b} className="text-center font-display text-xl md:text-2xl tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-all duration-500 grayscale hover:grayscale-0 cursor-pointer">
+              <div
+                key={b}
+                className="text-center font-display text-xl md:text-2xl tracking-[0.2em] text-muted-foreground/60 hover:text-primary transition-all duration-500 grayscale hover:grayscale-0 cursor-pointer"
+              >
                 {b}
               </div>
             ))}

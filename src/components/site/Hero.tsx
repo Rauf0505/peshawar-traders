@@ -17,44 +17,67 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
       </motion.div>
 
-      <motion.div style={{ opacity }} className="relative z-10 container-x h-full flex flex-col justify-end pb-24 md:pb-32">
+      <motion.div
+        style={{ opacity }}
+        className="relative z-10 container-x h-full flex flex-col justify-end pb-24 md:pb-32"
+      >
         <motion.span
-          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
           className="eyebrow text-white/70"
         >
-          Autumn Collection · 2026
+          Spring Collection · 2026
         </motion.span>
         <motion.h1
-          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="mt-5 max-w-3xl text-white font-display font-medium leading-[1.02] text-5xl sm:text-6xl md:text-7xl lg:text-[88px]"
         >
-          Built for the wild.<br />
+          Built for the wild.
+          <br />
           <span className="italic text-white/85">Trusted for life.</span>
         </motion.h1>
         <motion.p
-          initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.55 }}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.55 }}
           className="mt-6 max-w-xl text-base md:text-lg text-white/75 leading-relaxed"
         >
-          Precision airguns, tactical gear, and field-tested outdoor equipment — handpicked for hunters who refuse to compromise.
+          Premium airguns, tactical gear, and field-tested outdoor equipment — handpicked for those
+          who refuse to compromise.
         </motion.p>
         <motion.div
-          initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.7 }}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.7 }}
           className="mt-10 flex flex-wrap items-center gap-4"
         >
-          <a href="#products" className="group inline-flex items-center gap-3 bg-white text-charcoal px-8 py-4 text-sm font-semibold tracking-wide uppercase hover:bg-accent hover:text-accent-foreground transition-all duration-300">
+          <a
+            href="#products"
+            className="group inline-flex items-center gap-3 bg-white text-charcoal px-8 py-4 text-sm font-semibold tracking-wide uppercase rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300"
+          >
             Shop Now
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
-          <a href="#categories" className="inline-flex items-center gap-3 border border-white/40 text-white px-8 py-4 text-sm font-semibold tracking-wide uppercase hover:bg-white hover:text-charcoal transition-all duration-300">
+          <a
+            href="#categories"
+            className="inline-flex items-center gap-3 border border-white/40 text-white px-8 py-4 text-sm font-semibold tracking-wide uppercase rounded-md hover:bg-white hover:text-charcoal transition-all duration-300"
+          >
             Explore Categories
           </a>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2, duration: 1 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 1 }}
           className="absolute right-5 md:right-10 bottom-10 hidden md:flex flex-col items-center gap-3 text-white/60"
         >
-          <span className="text-[10px] tracking-[0.3em] uppercase rotate-90 origin-center mt-8">Scroll</span>
+          <span className="text-[10px] tracking-[0.3em] uppercase rotate-90 origin-center mt-8">
+            Scroll
+          </span>
           <div className="h-16 w-px bg-white/40" />
         </motion.div>
       </motion.div>

@@ -28,41 +28,33 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-olive: var(--olive);
-  --color-olive-light: var(--olive-light);
   --color-charcoal: var(--charcoal);
-  --color-sand: var(--sand);
-  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-display: "Inter", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
 :root {
   --radius: 0.5rem;
-  /* Hunting brand palette */
-  --background: oklch(0.99 0.003 90);
-  --foreground: oklch(0.18 0.012 150);
+  --background: oklch(0.99 0.003 75);
+  --foreground: oklch(0.12 0.01 20);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.012 150);
+  --card-foreground: oklch(0.12 0.01 20);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.012 150);
-  --primary: oklch(0.32 0.06 145);          /* deep forest green */
-  --primary-foreground: oklch(0.98 0.005 90);
-  --secondary: oklch(0.95 0.008 90);
-  --secondary-foreground: oklch(0.22 0.02 145);
-  --muted: oklch(0.96 0.005 90);
-  --muted-foreground: oklch(0.45 0.015 145);
-  --accent: oklch(0.55 0.09 95);            /* olive accent */
-  --accent-foreground: oklch(0.98 0 0);
+  --popover-foreground: oklch(0.12 0.01 20);
+  --primary: oklch(0.72 0.16 78);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.008 75);
+  --secondary-foreground: oklch(0.12 0.01 20);
+  --muted: oklch(0.97 0.005 75);
+  --muted-foreground: oklch(0.5 0.02 40);
+  --accent: oklch(0.15 0.01 20);
+  --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.9 0.008 90);
-  --input: oklch(0.92 0.008 90);
-  --ring: oklch(0.32 0.06 145);
-
-  --olive: oklch(0.55 0.09 110);
-  --olive-light: oklch(0.78 0.07 110);
-  --charcoal: oklch(0.22 0.01 145);
-  --sand: oklch(0.93 0.025 85);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.88 0.01 70);
+  --input: oklch(0.92 0.008 70);
+  --ring: oklch(0.65 0.13 70);
+  --charcoal: oklch(0.12 0.01 20);
 }
 
 @layer base {

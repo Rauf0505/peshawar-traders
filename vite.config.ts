@@ -15,7 +15,7 @@ export default defineConfig({
         },
       },
     }),
-    nitro({ defaultPreset: "cloudflare-module" }),
+    nitro({ preset: "node-server" }),
     react(),
     tailwindcss(),
     tsconfigPaths(),
@@ -38,9 +38,13 @@ export default defineConfig({
     include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime", "react/jsx-dev-runtime"],
     ignoreOutdatedRequests: true,
   },
-  build: {
-    rollupOptions: {
-      external: ["postgres"],
+  environments: {
+    client: {
+      build: {
+        rollupOptions: {
+          external: ["postgres"],
+        },
+      },
     },
   },
 });

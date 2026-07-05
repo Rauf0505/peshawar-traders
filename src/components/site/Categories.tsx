@@ -53,7 +53,7 @@ export function Categories() {
         </Reveal>
 
         <Stagger>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:auto-rows-[280px]">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[280px]">
             {cats.map((c: any) => (
             <motion.div
               key={c.slug}

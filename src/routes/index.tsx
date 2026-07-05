@@ -42,7 +42,7 @@ function Index() {
   return (
     <div className="bg-background text-foreground overflow-x-hidden">
       <Header />
-      <main>
+      <main className="pt-20">
         <Hero />
         <Categories />
         <Products />

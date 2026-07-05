@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -98,13 +99,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bb79167a-61fc-4cdc-a16b-093709cbeaae/id-preview-353b962a--1d6c86dd-51f4-430c-864c-6c296ab864b6.lovable.app-1780897016571.png",
+        content: "https://ik.imagekit.io/chaudaryrauf/wildwood/site/og-image_W-dqwqewx.png",
       },
       {
         name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bb79167a-61fc-4cdc-a16b-093709cbeaae/id-preview-353b962a--1d6c86dd-51f4-430c-864c-6c296ab864b6.lovable.app-1780897016571.png",
+        content: "https://ik.imagekit.io/chaudaryrauf/wildwood/site/og-image_W-dqwqewx.png",
       },
     ],
     links: [
@@ -141,6 +140,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <Toaster richColors closeButton />
     </QueryClientProvider>
   );
 }

@@ -1,0 +1,185 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { eq, and } from "drizzle-orm";
+import { getDb } from "../db/connection.server";
+import { products, categories, subcategories, homeAssignments } from "../db/schema.server";
+import { verifyToken } from "./auth.server";
+
+function requireAuth(token: string) {
+  const user = verifyToken(token);
+  if (!user) throw new Error("Unauthorized");
+  return user;
+}
+
+export const getHomeAssignments = createServerFn({ method: "GET" }).handler(async () => {
+  const db = await getDb();
+  const rows = await db
+    .select({
+      id: homeAssignments.id,
+      productId: homeAssignments.productId,
+      tabSlug: homeAssignments.tabSlug,
+      position: homeAssignments.position,
+      createdAt: homeAssignments.createdAt,
+      productName: products.name,
+      sku: products.sku,
+      price: products.price,
+      images: products.images,
+    })
+    .from(homeAssignments)
+    .innerJoin(products, eq(homeAssignments.productId, products.id))
+    .orderBy(homeAssignments.tabSlug, homeAssignments.position);
+
+  const grouped: Record<string, Array<Record<string, any>>> = {};
+  for (const row of rows) {
+    const tab = row.tabSlug;
+    if (!grouped[tab]) grouped[tab] = [];
+    grouped[tab].push({
+      ...row,
+      images: JSON.parse((row.images as string) || "[]"),
+    });
+  }
+  return grouped;
+});
+
+export const getHomePageProducts = createServerFn({ method: "GET" })
+  .validator(z.object({ tabSlug: z.string() }))
+  .handler(async ({ data }) => {
+    const db = await getDb();
+    const rows = await db
+      .select({
+        id: products.id,
+        name: products.name,
+        description: products.description,
+        sku: products.sku,
+        price: products.price,
+        comparePrice: products.comparePrice,
+        weight: products.weight,
+        material: products.material,
+        dimensions: products.dimensions,
+        color: products.color,
+        brand: products.brand,
+        stockStatus: products.stockStatus,
+        stockQuantity: products.stockQuantity,
+        visibility: products.visibility,
+        featured: products.featured,
+        rating: products.rating,
+        features: products.features,
+        metaTitle: products.metaTitle,
+        metaDescription: products.metaDescription,
+        images: products.images,
+        categoryName: categories.name,
+        categorySlug: categories.slug,
+        subcategoryName: subcategories.name,
+        subcategorySlug: subcategories.slug,
+        position: homeAssignments.position,
+      })
+      .from(homeAssignments)
+      .innerJoin(products, eq(homeAssignments.productId, products.id))
+      .leftJoin(categories, eq(products.categoryId, categories.id))
+      .leftJoin(subcategories, eq(products.subcategoryId, subcategories.id))
+      .where(eq(homeAssignments.tabSlug, data.tabSlug))
+      .orderBy(homeAssignments.position);
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      description: row.description ?? "",
+      sku: row.sku,
+      price: row.price,
+      comparePrice: row.comparePrice ?? null,
+      weight: row.weight ?? "",
+      material: row.material ?? "",
+      dimensions: row.dimensions ?? "",
+      color: row.color ?? "",
+      brand: row.brand ?? "",
+      stockStatus: row.stockStatus ?? "In Stock",
+      stockQuantity: row.stockQuantity ?? 0,
+      visibility: !!(row.visibility),
+      featured: !!(row.featured),
+      rating: row.rating ?? 0,
+      features: JSON.parse(row.features || "[]"),
+      metaTitle: row.metaTitle ?? "",
+      metaDescription: row.metaDescription ?? "",
+      images: JSON.parse(row.images || "[]"),
+      category: row.categoryName ?? null,
+      categorySlug: row.categorySlug ?? null,
+      subcategory: row.subcategoryName ?? null,
+      subcategorySlug: row.subcategorySlug ?? null,
+      position: row.position,
+    }));
+  });
+
+export const setHomeAssignment = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      token: z.string(),
+      productId: z.number(),
+      tabSlug: z.string(),
+      position: z.number(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    requireAuth(data.token);
+    const db = await getDb();
+    // Delete existing assignment for this product+tab, then insert
+    await db
+      .delete(homeAssignments)
+      .where(
+        and(
+          eq(homeAssignments.productId, data.productId),
+          eq(homeAssignments.tabSlug, data.tabSlug),
+        ),
+      );
+    await db.insert(homeAssignments).values({
+      productId: data.productId,
+      tabSlug: data.tabSlug,
+      position: data.position,
+    });
+    return { success: true };
+  });
+
+export const removeHomeAssignment = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      token: z.string(),
+      productId: z.number(),
+      tabSlug: z.string(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    requireAuth(data.token);
+    const db = await getDb();
+    await db
+      .delete(homeAssignments)
+      .where(
+        and(
+          eq(homeAssignments.productId, data.productId),
+          eq(homeAssignments.tabSlug, data.tabSlug),
+        ),
+      );
+    return { success: true };
+  });
+
+export const reorderHomeAssignments = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      token: z.string(),
+      tabSlug: z.string(),
+      productIds: z.array(z.number()),
+    }),
+  )
+  .handler(async ({ data }) => {
+    requireAuth(data.token);
+    const db = await getDb();
+    await db.delete(homeAssignments).where(eq(homeAssignments.tabSlug, data.tabSlug));
+    if (data.productIds.length > 0) {
+      await db.insert(homeAssignments).values(
+        data.productIds.map((pid, index) => ({
+          productId: pid,
+          tabSlug: data.tabSlug,
+          position: index + 1,
+        })),
+      );
+    }
+    return { success: true };
+  });

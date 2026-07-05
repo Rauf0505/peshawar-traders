@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import promo from "@/assets/promo.jpg";
+const PROMO_IMG = "https://ik.imagekit.io/chaudaryrauf/wildwood/site/promo_oZDWG3OTK.jpg";
 import { useEffect, useState } from "react";
 
 function useCountdown(targetHours = 47) {
@@ -44,7 +44,7 @@ export function Promo() {
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       <div className="absolute inset-0">
-        <img src={promo} alt="" loading="lazy" className="h-full w-full object-cover" />
+        <img src={PROMO_IMG} alt="" loading="lazy" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-charcoal/40" />
       </div>
       <div className="relative container-x">

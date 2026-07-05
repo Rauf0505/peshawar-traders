@@ -1,5 +1,5 @@
 import { Facebook, Instagram, Youtube, Twitter } from "lucide-react";
-import logo from "@/assets/logo.png";
+const LOGO_IMG = "https://ik.imagekit.io/chaudaryrauf/wildwood/site/logo_FQb_afTiw.png";
 
 const cols = [
   { title: "Shop", links: ["Airguns", "Pellets", "Tactical Vests", "Gun Pouches", "Optics", "Field Gear"] },
@@ -13,7 +13,7 @@ export function Footer() {
       <div className="container-x pt-20 pb-10">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10">
           <div className="col-span-2">
-            <img src={logo} alt="Peshawar Traders" className="h-24 w-auto mb-6" />
+            <img src={LOGO_IMG} alt="Peshawar Traders" className="h-24 w-auto mb-6" />
             <p className="text-sm leading-relaxed max-w-sm">
               Premium tactical and outdoor equipment for those who refuse to compromise.
               Family owned, three generations strong.

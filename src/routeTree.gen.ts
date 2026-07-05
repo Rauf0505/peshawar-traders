@@ -10,20 +10,54 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as ProductsRouteImport } from './routes/products'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BrandsRouteImport } from './routes/brands'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ShopCategoryRouteImport } from './routes/shop/$category'
 import { Route as ProductIdRouteImport } from './routes/product/$id'
+import { Route as BrandsSlugRouteImport } from './routes/brands/$slug'
+import { Route as AdminSubcategoriesRouteImport } from './routes/admin/subcategories'
+import { Route as AdminProductsRouteImport } from './routes/admin/products'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminHomeControlRouteImport } from './routes/admin/home-control'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
+import { Route as AdminBrandsRouteImport } from './routes/admin/brands'
+import { Route as AdminSubcategoriesNewRouteImport } from './routes/admin/subcategories/new'
+import { Route as AdminProductsNewRouteImport } from './routes/admin/products/new'
+import { Route as AdminCategoriesNewRouteImport } from './routes/admin/categories/new'
+import { Route as AdminBrandsNewRouteImport } from './routes/admin/brands/new'
+import { Route as AdminSubcategoriesIdEditRouteImport } from './routes/admin/subcategories/$id.edit'
+import { Route as AdminProductsIdEditRouteImport } from './routes/admin/products/$id.edit'
+import { Route as AdminCategoriesIdEditRouteImport } from './routes/admin/categories/$id.edit'
+import { Route as AdminBrandsIdEditRouteImport } from './routes/admin/brands/$id.edit'
 
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrandsRoute = BrandsRouteImport.update({
+  id: '/brands',
+  path: '/brands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -36,6 +70,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ShopCategoryRoute = ShopCategoryRouteImport.update({
   id: '/$category',
   path: '/$category',
@@ -46,57 +85,254 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BrandsSlugRoute = BrandsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BrandsRoute,
+} as any)
+const AdminSubcategoriesRoute = AdminSubcategoriesRouteImport.update({
+  id: '/subcategories',
+  path: '/subcategories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHomeControlRoute = AdminHomeControlRouteImport.update({
+  id: '/home-control',
+  path: '/home-control',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBrandsRoute = AdminBrandsRouteImport.update({
+  id: '/brands',
+  path: '/brands',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubcategoriesNewRoute = AdminSubcategoriesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminSubcategoriesRoute,
+} as any)
+const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminProductsRoute,
+} as any)
+const AdminCategoriesNewRoute = AdminCategoriesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminCategoriesRoute,
+} as any)
+const AdminBrandsNewRoute = AdminBrandsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminBrandsRoute,
+} as any)
+const AdminSubcategoriesIdEditRoute =
+  AdminSubcategoriesIdEditRouteImport.update({
+    id: '/$id/edit',
+    path: '/$id/edit',
+    getParentRoute: () => AdminSubcategoriesRoute,
+  } as any)
+const AdminProductsIdEditRoute = AdminProductsIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminProductsRoute,
+} as any)
+const AdminCategoriesIdEditRoute = AdminCategoriesIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminCategoriesRoute,
+} as any)
+const AdminBrandsIdEditRoute = AdminBrandsIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminBrandsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/brands': typeof BrandsRouteWithChildren
   '/contact': typeof ContactRoute
+  '/products': typeof ProductsRoute
   '/shop': typeof ShopRouteWithChildren
+  '/admin/brands': typeof AdminBrandsRouteWithChildren
+  '/admin/categories': typeof AdminCategoriesRouteWithChildren
+  '/admin/home-control': typeof AdminHomeControlRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRouteWithChildren
+  '/admin/subcategories': typeof AdminSubcategoriesRouteWithChildren
+  '/brands/$slug': typeof BrandsSlugRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/brands/new': typeof AdminBrandsNewRoute
+  '/admin/categories/new': typeof AdminCategoriesNewRoute
+  '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/subcategories/new': typeof AdminSubcategoriesNewRoute
+  '/admin/brands/$id/edit': typeof AdminBrandsIdEditRoute
+  '/admin/categories/$id/edit': typeof AdminCategoriesIdEditRoute
+  '/admin/products/$id/edit': typeof AdminProductsIdEditRoute
+  '/admin/subcategories/$id/edit': typeof AdminSubcategoriesIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/brands': typeof BrandsRouteWithChildren
   '/contact': typeof ContactRoute
+  '/products': typeof ProductsRoute
   '/shop': typeof ShopRouteWithChildren
+  '/admin/brands': typeof AdminBrandsRouteWithChildren
+  '/admin/categories': typeof AdminCategoriesRouteWithChildren
+  '/admin/home-control': typeof AdminHomeControlRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRouteWithChildren
+  '/admin/subcategories': typeof AdminSubcategoriesRouteWithChildren
+  '/brands/$slug': typeof BrandsSlugRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/brands/new': typeof AdminBrandsNewRoute
+  '/admin/categories/new': typeof AdminCategoriesNewRoute
+  '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/subcategories/new': typeof AdminSubcategoriesNewRoute
+  '/admin/brands/$id/edit': typeof AdminBrandsIdEditRoute
+  '/admin/categories/$id/edit': typeof AdminCategoriesIdEditRoute
+  '/admin/products/$id/edit': typeof AdminProductsIdEditRoute
+  '/admin/subcategories/$id/edit': typeof AdminSubcategoriesIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/brands': typeof BrandsRouteWithChildren
   '/contact': typeof ContactRoute
+  '/products': typeof ProductsRoute
   '/shop': typeof ShopRouteWithChildren
+  '/admin/brands': typeof AdminBrandsRouteWithChildren
+  '/admin/categories': typeof AdminCategoriesRouteWithChildren
+  '/admin/home-control': typeof AdminHomeControlRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRouteWithChildren
+  '/admin/subcategories': typeof AdminSubcategoriesRouteWithChildren
+  '/brands/$slug': typeof BrandsSlugRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/brands/new': typeof AdminBrandsNewRoute
+  '/admin/categories/new': typeof AdminCategoriesNewRoute
+  '/admin/products/new': typeof AdminProductsNewRoute
+  '/admin/subcategories/new': typeof AdminSubcategoriesNewRoute
+  '/admin/brands/$id/edit': typeof AdminBrandsIdEditRoute
+  '/admin/categories/$id/edit': typeof AdminCategoriesIdEditRoute
+  '/admin/products/$id/edit': typeof AdminProductsIdEditRoute
+  '/admin/subcategories/$id/edit': typeof AdminSubcategoriesIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
+    | '/brands'
     | '/contact'
+    | '/products'
     | '/shop'
+    | '/admin/brands'
+    | '/admin/categories'
+    | '/admin/home-control'
+    | '/admin/login'
+    | '/admin/products'
+    | '/admin/subcategories'
+    | '/brands/$slug'
     | '/product/$id'
     | '/shop/$category'
+    | '/admin/'
+    | '/admin/brands/new'
+    | '/admin/categories/new'
+    | '/admin/products/new'
+    | '/admin/subcategories/new'
+    | '/admin/brands/$id/edit'
+    | '/admin/categories/$id/edit'
+    | '/admin/products/$id/edit'
+    | '/admin/subcategories/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/shop' | '/product/$id' | '/shop/$category'
+  to:
+    | '/'
+    | '/about'
+    | '/brands'
+    | '/contact'
+    | '/products'
+    | '/shop'
+    | '/admin/brands'
+    | '/admin/categories'
+    | '/admin/home-control'
+    | '/admin/login'
+    | '/admin/products'
+    | '/admin/subcategories'
+    | '/brands/$slug'
+    | '/product/$id'
+    | '/shop/$category'
+    | '/admin'
+    | '/admin/brands/new'
+    | '/admin/categories/new'
+    | '/admin/products/new'
+    | '/admin/subcategories/new'
+    | '/admin/brands/$id/edit'
+    | '/admin/categories/$id/edit'
+    | '/admin/products/$id/edit'
+    | '/admin/subcategories/$id/edit'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
+    | '/brands'
     | '/contact'
+    | '/products'
     | '/shop'
+    | '/admin/brands'
+    | '/admin/categories'
+    | '/admin/home-control'
+    | '/admin/login'
+    | '/admin/products'
+    | '/admin/subcategories'
+    | '/brands/$slug'
     | '/product/$id'
     | '/shop/$category'
+    | '/admin/'
+    | '/admin/brands/new'
+    | '/admin/categories/new'
+    | '/admin/products/new'
+    | '/admin/subcategories/new'
+    | '/admin/brands/$id/edit'
+    | '/admin/categories/$id/edit'
+    | '/admin/products/$id/edit'
+    | '/admin/subcategories/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  BrandsRoute: typeof BrandsRouteWithChildren
   ContactRoute: typeof ContactRoute
+  ProductsRoute: typeof ProductsRoute
   ShopRoute: typeof ShopRouteWithChildren
   ProductIdRoute: typeof ProductIdRoute
 }
@@ -110,11 +346,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brands': {
+      id: '/brands'
+      path: '/brands'
+      fullPath: '/brands'
+      preLoaderRoute: typeof BrandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -131,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/shop/$category': {
       id: '/shop/$category'
       path: '/$category'
@@ -145,8 +409,201 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brands/$slug': {
+      id: '/brands/$slug'
+      path: '/$slug'
+      fullPath: '/brands/$slug'
+      preLoaderRoute: typeof BrandsSlugRouteImport
+      parentRoute: typeof BrandsRoute
+    }
+    '/admin/subcategories': {
+      id: '/admin/subcategories'
+      path: '/subcategories'
+      fullPath: '/admin/subcategories'
+      preLoaderRoute: typeof AdminSubcategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/home-control': {
+      id: '/admin/home-control'
+      path: '/home-control'
+      fullPath: '/admin/home-control'
+      preLoaderRoute: typeof AdminHomeControlRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/brands': {
+      id: '/admin/brands'
+      path: '/brands'
+      fullPath: '/admin/brands'
+      preLoaderRoute: typeof AdminBrandsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/subcategories/new': {
+      id: '/admin/subcategories/new'
+      path: '/new'
+      fullPath: '/admin/subcategories/new'
+      preLoaderRoute: typeof AdminSubcategoriesNewRouteImport
+      parentRoute: typeof AdminSubcategoriesRoute
+    }
+    '/admin/products/new': {
+      id: '/admin/products/new'
+      path: '/new'
+      fullPath: '/admin/products/new'
+      preLoaderRoute: typeof AdminProductsNewRouteImport
+      parentRoute: typeof AdminProductsRoute
+    }
+    '/admin/categories/new': {
+      id: '/admin/categories/new'
+      path: '/new'
+      fullPath: '/admin/categories/new'
+      preLoaderRoute: typeof AdminCategoriesNewRouteImport
+      parentRoute: typeof AdminCategoriesRoute
+    }
+    '/admin/brands/new': {
+      id: '/admin/brands/new'
+      path: '/new'
+      fullPath: '/admin/brands/new'
+      preLoaderRoute: typeof AdminBrandsNewRouteImport
+      parentRoute: typeof AdminBrandsRoute
+    }
+    '/admin/subcategories/$id/edit': {
+      id: '/admin/subcategories/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/subcategories/$id/edit'
+      preLoaderRoute: typeof AdminSubcategoriesIdEditRouteImport
+      parentRoute: typeof AdminSubcategoriesRoute
+    }
+    '/admin/products/$id/edit': {
+      id: '/admin/products/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/products/$id/edit'
+      preLoaderRoute: typeof AdminProductsIdEditRouteImport
+      parentRoute: typeof AdminProductsRoute
+    }
+    '/admin/categories/$id/edit': {
+      id: '/admin/categories/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/categories/$id/edit'
+      preLoaderRoute: typeof AdminCategoriesIdEditRouteImport
+      parentRoute: typeof AdminCategoriesRoute
+    }
+    '/admin/brands/$id/edit': {
+      id: '/admin/brands/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/brands/$id/edit'
+      preLoaderRoute: typeof AdminBrandsIdEditRouteImport
+      parentRoute: typeof AdminBrandsRoute
+    }
   }
 }
+
+interface AdminBrandsRouteChildren {
+  AdminBrandsNewRoute: typeof AdminBrandsNewRoute
+  AdminBrandsIdEditRoute: typeof AdminBrandsIdEditRoute
+}
+
+const AdminBrandsRouteChildren: AdminBrandsRouteChildren = {
+  AdminBrandsNewRoute: AdminBrandsNewRoute,
+  AdminBrandsIdEditRoute: AdminBrandsIdEditRoute,
+}
+
+const AdminBrandsRouteWithChildren = AdminBrandsRoute._addFileChildren(
+  AdminBrandsRouteChildren,
+)
+
+interface AdminCategoriesRouteChildren {
+  AdminCategoriesNewRoute: typeof AdminCategoriesNewRoute
+  AdminCategoriesIdEditRoute: typeof AdminCategoriesIdEditRoute
+}
+
+const AdminCategoriesRouteChildren: AdminCategoriesRouteChildren = {
+  AdminCategoriesNewRoute: AdminCategoriesNewRoute,
+  AdminCategoriesIdEditRoute: AdminCategoriesIdEditRoute,
+}
+
+const AdminCategoriesRouteWithChildren = AdminCategoriesRoute._addFileChildren(
+  AdminCategoriesRouteChildren,
+)
+
+interface AdminProductsRouteChildren {
+  AdminProductsNewRoute: typeof AdminProductsNewRoute
+  AdminProductsIdEditRoute: typeof AdminProductsIdEditRoute
+}
+
+const AdminProductsRouteChildren: AdminProductsRouteChildren = {
+  AdminProductsNewRoute: AdminProductsNewRoute,
+  AdminProductsIdEditRoute: AdminProductsIdEditRoute,
+}
+
+const AdminProductsRouteWithChildren = AdminProductsRoute._addFileChildren(
+  AdminProductsRouteChildren,
+)
+
+interface AdminSubcategoriesRouteChildren {
+  AdminSubcategoriesNewRoute: typeof AdminSubcategoriesNewRoute
+  AdminSubcategoriesIdEditRoute: typeof AdminSubcategoriesIdEditRoute
+}
+
+const AdminSubcategoriesRouteChildren: AdminSubcategoriesRouteChildren = {
+  AdminSubcategoriesNewRoute: AdminSubcategoriesNewRoute,
+  AdminSubcategoriesIdEditRoute: AdminSubcategoriesIdEditRoute,
+}
+
+const AdminSubcategoriesRouteWithChildren =
+  AdminSubcategoriesRoute._addFileChildren(AdminSubcategoriesRouteChildren)
+
+interface AdminRouteChildren {
+  AdminBrandsRoute: typeof AdminBrandsRouteWithChildren
+  AdminCategoriesRoute: typeof AdminCategoriesRouteWithChildren
+  AdminHomeControlRoute: typeof AdminHomeControlRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminProductsRoute: typeof AdminProductsRouteWithChildren
+  AdminSubcategoriesRoute: typeof AdminSubcategoriesRouteWithChildren
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminBrandsRoute: AdminBrandsRouteWithChildren,
+  AdminCategoriesRoute: AdminCategoriesRouteWithChildren,
+  AdminHomeControlRoute: AdminHomeControlRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminProductsRoute: AdminProductsRouteWithChildren,
+  AdminSubcategoriesRoute: AdminSubcategoriesRouteWithChildren,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface BrandsRouteChildren {
+  BrandsSlugRoute: typeof BrandsSlugRoute
+}
+
+const BrandsRouteChildren: BrandsRouteChildren = {
+  BrandsSlugRoute: BrandsSlugRoute,
+}
+
+const BrandsRouteWithChildren =
+  BrandsRoute._addFileChildren(BrandsRouteChildren)
 
 interface ShopRouteChildren {
   ShopCategoryRoute: typeof ShopCategoryRoute
@@ -161,7 +618,10 @@ const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  BrandsRoute: BrandsRouteWithChildren,
   ContactRoute: ContactRoute,
+  ProductsRoute: ProductsRoute,
   ShopRoute: ShopRouteWithChildren,
   ProductIdRoute: ProductIdRoute,
 }

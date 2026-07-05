@@ -69,7 +69,7 @@ function AboutPage() {
                 <div className="grid md:grid-cols-2 gap-10 items-center">
                   <div>
                     <img
-                      src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800&q=80"
+                      src="https://ik.imagekit.io/chaudaryrauf/wildwood/site/about-hero_t8dKGCUiK.jpg"
                       alt="Our workshop"
                       className="rounded-md w-full h-auto object-cover"
                       loading="lazy"

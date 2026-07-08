@@ -68,7 +68,7 @@ export function Categories({ categories }: { categories: any[] }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
                 <span className="absolute top-4 right-4 z-10 bg-black/45 backdrop-blur-md px-2.5 py-1 rounded text-[10px] text-white/80 font-medium tracking-wider">
-                  {c.product_count || 0} Products
+                  {c.productCount ?? 0} Products
                 </span>
 
                 <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end">

@@ -16,12 +16,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Peshawar Traders" }],
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "https://ik.imagekit.io/chaudaryrauf/wildwood/site/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "https://ik.imagekit.io/chaudaryrauf/wildwood/site/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: "/apple-touch-icon.png",
+    apple: "https://ik.imagekit.io/chaudaryrauf/wildwood/site/apple-touch-icon.png",
+    other: [
+      { rel: "icon", url: "https://ik.imagekit.io/chaudaryrauf/wildwood/site/favicon.ico", sizes: "48x48" },
+    ],
   },
-  manifest: "/site.webmanifest",
+  manifest: "https://ik.imagekit.io/chaudaryrauf/wildwood/site/site.webmanifest",
   openGraph: {
     title: "Peshawar Traders",
     description:

@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { eq, sql, getTableColumns } from "drizzle-orm";
 import { getDb } from "../db/connection.server";
@@ -74,7 +73,7 @@ async function baseProductQuery() {
     .leftJoin(brands, eq(products.brandId, brands.id));
 }
 
-export const getProducts = createServerFn({ method: "GET" }).handler(async () => {
+export async function getProducts() {
   const db = await getDb();
   const rows = await db
     .select()
@@ -84,11 +83,9 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
     .leftJoin(brands, eq(products.brandId, brands.id))
     .orderBy(products.name);
   return rows.map(flattenProduct);
-});
+}
 
-export const getProductById = createServerFn({ method: "GET" })
-  .validator(z.object({ id: z.string() }))
-  .handler(async ({ data }) => {
+export async function getProductById({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select()
@@ -99,11 +96,9 @@ export const getProductById = createServerFn({ method: "GET" })
       .where(eq(products.sku, data.id))
       .limit(1);
     return rows.length > 0 ? flattenProduct(rows[0]) : null;
-  });
+  }
 
-export const getProductByDbId = createServerFn({ method: "GET" })
-  .validator(z.object({ id: z.number() }))
-  .handler(async ({ data }) => {
+export async function getProductByDbId({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select()
@@ -114,9 +109,9 @@ export const getProductByDbId = createServerFn({ method: "GET" })
       .where(eq(products.id, data.id))
       .limit(1);
     return rows.length > 0 ? flattenProduct(rows[0]) : null;
-  });
+  }
 
-export const getCategories = createServerFn({ method: "GET" }).handler(async () => {
+export async function getCategories() {
   const db = await getDb();
   const rows = await db
     .select({
@@ -126,9 +121,9 @@ export const getCategories = createServerFn({ method: "GET" }).handler(async () 
     .from(categories)
     .orderBy(categories.displayOrder, categories.name);
   return rows;
-});
+}
 
-export const getSubcategories = createServerFn({ method: "GET" }).handler(async () => {
+export async function getSubcategories() {
   const db = await getDb();
   const rows = await db
     .select({
@@ -139,11 +134,9 @@ export const getSubcategories = createServerFn({ method: "GET" }).handler(async 
     .leftJoin(categories, eq(subcategories.categoryId, categories.id))
     .orderBy(subcategories.name);
   return rows;
-});
+}
 
-export const getProductsByCategory = createServerFn({ method: "GET" })
-  .validator(z.object({ categorySlug: z.string() }))
-  .handler(async ({ data }) => {
+export async function getProductsByCategory({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select()
@@ -154,11 +147,9 @@ export const getProductsByCategory = createServerFn({ method: "GET" })
       .where(eq(categories.slug, data.categorySlug))
       .orderBy(products.name);
     return rows.map(flattenProduct);
-  });
+  }
 
-export const getProductsBySubcategory = createServerFn({ method: "GET" })
-  .validator(z.object({ subcategorySlug: z.string() }))
-  .handler(async ({ data }) => {
+export async function getProductsBySubcategory({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select()
@@ -169,37 +160,9 @@ export const getProductsBySubcategory = createServerFn({ method: "GET" })
       .where(eq(subcategories.slug, data.subcategorySlug))
       .orderBy(products.name);
     return rows.map(flattenProduct);
-  });
+  }
 
-export const createProduct = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      name: z.string().min(1),
-      description: z.string().optional(),
-      sku: z.string().min(1),
-      price: z.number(),
-      comparePrice: z.number().optional(),
-      weight: z.string().optional(),
-      material: z.string().optional(),
-      dimensions: z.string().optional(),
-      color: z.string().optional(),
-      brand: z.string().optional(),
-      brandId: z.number().optional(),
-      stockStatus: z.string().optional(),
-      stockQuantity: z.number().optional(),
-      visibility: z.boolean().optional(),
-      featured: z.boolean().optional(),
-      features: z.array(z.string()).optional(),
-      metaTitle: z.string().optional(),
-      metaDescription: z.string().optional(),
-      categoryId: z.number().optional(),
-      subcategoryId: z.number().optional(),
-      images: z.array(z.string()).optional(),
-      rating: z.number().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function createProduct({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const now = new Date().toISOString();
@@ -233,38 +196,9 @@ export const createProduct = createServerFn({ method: "POST" })
       })
       .returning({ id: products.id });
     return { id: result.id };
-  });
+  }
 
-export const updateProduct = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-      name: z.string().min(1),
-      description: z.string().optional(),
-      sku: z.string().min(1),
-      price: z.number(),
-      comparePrice: z.number().optional(),
-      weight: z.string().optional(),
-      material: z.string().optional(),
-      dimensions: z.string().optional(),
-      color: z.string().optional(),
-      brand: z.string().optional(),
-      brandId: z.number().optional(),
-      stockStatus: z.string().optional(),
-      stockQuantity: z.number().optional(),
-      visibility: z.boolean().optional(),
-      featured: z.boolean().optional(),
-      features: z.array(z.string()).optional(),
-      metaTitle: z.string().optional(),
-      metaDescription: z.string().optional(),
-      categoryId: z.number().optional(),
-      subcategoryId: z.number().optional(),
-      images: z.array(z.string()).optional(),
-      rating: z.number().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function updateProduct({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -296,26 +230,19 @@ export const updateProduct = createServerFn({ method: "POST" })
       })
       .where(eq(products.id, data.id));
     return { success: true };
-  });
+  }
 
-export const deleteProduct = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function deleteProduct({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db.delete(homeAssignments).where(eq(homeAssignments.productId, data.id));
     await db.delete(products).where(eq(products.id, data.id));
     return { success: true };
-  });
+  }
 
 // ─── Categories CRUD ────────────────────────────────────────────────────────
 
-export const getCategoriesWithSubcategories = createServerFn({ method: "GET" }).handler(async () => {
+export async function getCategoriesWithSubcategories() {
   const db = await getDb();
   const cats = await db
     .select()
@@ -338,20 +265,9 @@ export const getCategoriesWithSubcategories = createServerFn({ method: "GET" }).
     }
   }
   return Object.values(catMap);
-});
+}
 
-export const createCategory = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      name: z.string().min(1),
-      slug: z.string().min(1),
-      description: z.string().optional(),
-      displayOrder: z.number().optional(),
-      status: z.number().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function createCategory({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const [result] = await db
@@ -365,21 +281,9 @@ export const createCategory = createServerFn({ method: "POST" })
       })
       .returning({ id: categories.id });
     return { id: result.id };
-  });
+  }
 
-export const updateCategory = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-      name: z.string().min(1),
-      slug: z.string().min(1),
-      description: z.string().optional(),
-      displayOrder: z.number().optional(),
-      status: z.number().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function updateCategory({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -393,11 +297,9 @@ export const updateCategory = createServerFn({ method: "POST" })
       })
       .where(eq(categories.id, data.id));
     return { success: true };
-  });
+  }
 
-export const deleteCategory = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string(), id: z.number() }))
-  .handler(async ({ data }) => {
+export async function deleteCategory({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -407,13 +309,11 @@ export const deleteCategory = createServerFn({ method: "POST" })
     await db.delete(subcategories).where(eq(subcategories.categoryId, data.id));
     await db.delete(categories).where(eq(categories.id, data.id));
     return { success: true };
-  });
+  }
 
 // ─── Subcategories CRUD ─────────────────────────────────────────────────────
 
-export const getSubcategoriesByCategory = createServerFn({ method: "GET" })
-  .validator(z.object({ categoryId: z.number() }))
-  .handler(async ({ data }) => {
+export async function getSubcategoriesByCategory({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select()
@@ -421,21 +321,9 @@ export const getSubcategoriesByCategory = createServerFn({ method: "GET" })
       .where(eq(subcategories.categoryId, data.categoryId))
       .orderBy(subcategories.displayOrder, subcategories.name);
     return rows;
-  });
+  }
 
-export const createSubcategory = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      categoryId: z.number(),
-      name: z.string().min(1),
-      slug: z.string().min(1),
-      description: z.string().optional(),
-      displayOrder: z.number().optional(),
-      status: z.number().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function createSubcategory({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const [result] = await db
@@ -450,22 +338,9 @@ export const createSubcategory = createServerFn({ method: "POST" })
       })
       .returning({ id: subcategories.id });
     return { id: result.id };
-  });
+  }
 
-export const updateSubcategory = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-      categoryId: z.number(),
-      name: z.string().min(1),
-      slug: z.string().min(1),
-      description: z.string().optional(),
-      displayOrder: z.number().optional(),
-      status: z.number().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function updateSubcategory({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -480,11 +355,9 @@ export const updateSubcategory = createServerFn({ method: "POST" })
       })
       .where(eq(subcategories.id, data.id));
     return { success: true };
-  });
+  }
 
-export const deleteSubcategory = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string(), id: z.number() }))
-  .handler(async ({ data }) => {
+export async function deleteSubcategory({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -493,4 +366,4 @@ export const deleteSubcategory = createServerFn({ method: "POST" })
       .where(eq(products.subcategoryId, data.id));
     await db.delete(subcategories).where(eq(subcategories.id, data.id));
     return { success: true };
-  });
+  }

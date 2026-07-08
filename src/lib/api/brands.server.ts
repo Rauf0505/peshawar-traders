@@ -1,6 +1,5 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { eq, sql, and, or, like, asc, desc, getTableColumns } from "drizzle-orm";
+import { eq, sql, and, or, like, asc, desc, getTableColumns, type SQL } from "drizzle-orm";
 import { getDb } from "../db/connection.server";
 import { products, categories, subcategories, brands, brandFeaturedProducts } from "../db/schema.server";
 import { verifyToken } from "./auth.server";
@@ -57,7 +56,7 @@ function flattenProduct(row: {
   };
 }
 
-export const getBrands = createServerFn({ method: "GET" }).handler(async () => {
+export async function getBrands() {
   const db = await getDb();
   const rows = await db
     .select({
@@ -84,11 +83,9 @@ export const getBrands = createServerFn({ method: "GET" }).handler(async () => {
     createdAt: r.createdAt ?? "",
     updatedAt: r.updatedAt ?? "",
   }));
-});
+}
 
-export const getBrandBySlug = createServerFn({ method: "GET" })
-  .validator(z.object({ slug: z.string() }))
-  .handler(async ({ data }) => {
+export async function getBrandBySlug({ data }: { data: any }) {
     const db = await getDb();
     const [brand] = await db
       .select()
@@ -120,11 +117,9 @@ export const getBrandBySlug = createServerFn({ method: "GET" })
       bannerImage: brand.bannerImage ?? null,
       featuredProducts: featured.map(flattenProduct),
     };
-  });
+  }
 
-export const getProductsByBrand = createServerFn({ method: "GET" })
-  .validator(z.object({ brandSlug: z.string() }))
-  .handler(async ({ data }) => {
+export async function getProductsByBrand({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select()
@@ -135,9 +130,9 @@ export const getProductsByBrand = createServerFn({ method: "GET" })
       .where(eq(brands.slug, data.brandSlug))
       .orderBy(products.name);
     return rows.map(flattenProduct);
-  });
+  }
 
-export const getCountries = createServerFn({ method: "GET" }).handler(async () => {
+export async function getCountries() {
   const db = await getDb();
   const rows = await db
     .select({ country: brands.country })
@@ -149,22 +144,11 @@ export const getCountries = createServerFn({ method: "GET" }).handler(async () =
     .groupBy(brands.country)
     .orderBy(brands.country);
   return rows.map((r) => r.country);
-});
+}
 
-export const getProductsFiltered = createServerFn({ method: "GET" })
-  .validator(
-    z.object({
-      category: z.string().optional(),
-      brand: z.string().optional(),
-      country: z.string().optional(),
-      subcategory: z.string().optional(),
-      search: z.string().optional(),
-      sort: z.string().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function getProductsFiltered({ data }: { data: any }) {
     const db = await getDb();
-    const conditions = [];
+    const conditions: (SQL | undefined)[] = [];
 
     if (data.category) {
       conditions.push(eq(categories.slug, data.category));
@@ -208,21 +192,9 @@ export const getProductsFiltered = createServerFn({ method: "GET" })
 
     const rows = await filteredQuery.orderBy(...orderBy);
     return rows.map(flattenProduct);
-  });
+  }
 
-export const createBrand = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      name: z.string().min(1),
-      country: z.string().min(1),
-      slug: z.string().min(1),
-      description: z.string().optional(),
-      logo: z.string().optional(),
-      bannerImage: z.string().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function createBrand({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const now = new Date().toISOString();
@@ -240,22 +212,9 @@ export const createBrand = createServerFn({ method: "POST" })
       })
       .returning({ id: brands.id });
     return { id: result.id };
-  });
+  }
 
-export const updateBrand = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-      name: z.string().min(1),
-      country: z.string().min(1),
-      slug: z.string().min(1),
-      description: z.string().optional(),
-      logo: z.string().optional(),
-      bannerImage: z.string().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function updateBrand({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -271,27 +230,17 @@ export const updateBrand = createServerFn({ method: "POST" })
       })
       .where(eq(brands.id, data.id));
     return { success: true };
-  });
+  }
 
-export const deleteBrand = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string(), id: z.number() }))
-  .handler(async ({ data }) => {
+export async function deleteBrand({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db.delete(brandFeaturedProducts).where(eq(brandFeaturedProducts.brandId, data.id));
     await db.delete(brands).where(eq(brands.id, data.id));
     return { success: true };
-  });
+  }
 
-export const setBrandFeaturedProducts = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      brandId: z.number(),
-      productIds: z.array(z.number()),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function setBrandFeaturedProducts({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db.delete(brandFeaturedProducts).where(eq(brandFeaturedProducts.brandId, data.brandId));
@@ -305,11 +254,9 @@ export const setBrandFeaturedProducts = createServerFn({ method: "POST" })
       );
     }
     return { success: true };
-  });
+  }
 
-export const getBrandFeaturedProducts = createServerFn({ method: "GET" })
-  .validator(z.object({ brandId: z.number() }))
-  .handler(async ({ data }) => {
+export async function getBrandFeaturedProducts({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select({ productId: brandFeaturedProducts.productId })
@@ -317,4 +264,4 @@ export const getBrandFeaturedProducts = createServerFn({ method: "GET" })
       .where(eq(brandFeaturedProducts.brandId, data.brandId))
       .orderBy(brandFeaturedProducts.position);
     return rows.map((r) => r.productId);
-  });
+  }

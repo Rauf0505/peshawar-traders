@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
 import { getDb } from "../db/connection.server";
@@ -87,7 +86,7 @@ async function getAllProducts(db: any) {
   return rows.map((row, i) => mapProductRow(row, i + 1));
 }
 
-export const getHomeAssignments = createServerFn({ method: "GET" }).handler(async () => {
+export async function getHomeAssignments() {
   const db = await getDb();
   const rows = await db
     .select({
@@ -115,11 +114,9 @@ export const getHomeAssignments = createServerFn({ method: "GET" }).handler(asyn
     });
   }
   return grouped;
-});
+}
 
-export const getHomePageProducts = createServerFn({ method: "GET" })
-  .validator(z.object({ tabSlug: z.string() }))
-  .handler(async ({ data }) => {
+export async function getHomePageProducts({ data }: { data: any }) {
     const db = await getDb();
 
     if (data.tabSlug === "all") {
@@ -165,18 +162,9 @@ export const getHomePageProducts = createServerFn({ method: "GET" })
       .orderBy(homeAssignments.position);
 
     return rows.map((row) => mapProductRow(row, row.position));
-  });
+  }
 
-export const setHomeAssignment = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      productId: z.number(),
-      tabSlug: z.string(),
-      position: z.number(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function setHomeAssignment({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -193,17 +181,9 @@ export const setHomeAssignment = createServerFn({ method: "POST" })
       position: data.position,
     });
     return { success: true };
-  });
+  }
 
-export const removeHomeAssignment = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      productId: z.number(),
-      tabSlug: z.string(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function removeHomeAssignment({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -215,17 +195,9 @@ export const removeHomeAssignment = createServerFn({ method: "POST" })
         ),
       );
     return { success: true };
-  });
+  }
 
-export const reorderHomeAssignments = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      tabSlug: z.string(),
-      productIds: z.array(z.number()),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function reorderHomeAssignments({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db.delete(homeAssignments).where(eq(homeAssignments.tabSlug, data.tabSlug));
@@ -239,4 +211,4 @@ export const reorderHomeAssignments = createServerFn({ method: "POST" })
       );
     }
     return { success: true };
-  });
+  }

@@ -1,6 +1,8 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { Reveal, Stagger } from "./Reveal";
-import { getHomePageProducts } from "@/lib/api/home-assignments.server";
+import { getHomePageProducts } from "@/lib/api-client";
 import { ProductCard } from "./ProductCard";
 
 const tabs = [

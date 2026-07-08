@@ -1,6 +1,8 @@
+"use client";
+
 import { useState } from "react";
 import { StarRating } from "./StarRating";
-import { createReview } from "@/lib/api/reviews.server";
+import { createReview } from "@/lib/api-client";
 import { toast } from "sonner";
 
 export function ReviewForm({

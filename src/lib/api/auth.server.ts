@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { getDb } from "../db/connection.server";
@@ -51,12 +50,7 @@ function verifyPassword(password: string, hash: string): boolean {
   return timingSafeEqual(Buffer.from(derived), Buffer.from(key));
 }
 
-export const login = createServerFn({ method: "POST" })
-  .validator(z.object({
-    username: z.string().min(1),
-    password: z.string().min(1),
-  }))
-  .handler(async ({ data }) => {
+export async function login({ data }: { data: any }) {
     const db = await getDb();
     const [user] = await db
       .select()
@@ -70,11 +64,9 @@ export const login = createServerFn({ method: "POST" })
 
     const token = createToken(user.username);
     return { success: true, token };
-  });
+  }
 
-export const verifyAuth = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string() }))
-  .handler(async ({ data }) => {
+export async function verifyAuth({ data }: { data: any }) {
     const result = verifyToken(data.token);
     return { valid: !!result, username: result?.username ?? null };
-  });
+  }

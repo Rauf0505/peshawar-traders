@@ -1,5 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Reveal, Stagger, itemVariants } from "./Reveal";
 const catImages: Record<string, string> = {
@@ -58,7 +60,7 @@ export function Categories({ categories }: { categories: any[] }) {
               variants={itemVariants}
               className={`group relative overflow-hidden rounded-md bg-charcoal h-full ${catSpan[c.slug] || ""}`}
             >
-              <Link to="/products" search={{ category: c.slug }} className="block h-full w-full">
+              <Link href={`/products?category=${c.slug}`} className="block h-full w-full">
                 <img
                   src={catImages[c.slug] || "https://ik.imagekit.io/chaudaryrauf/wildwood/categories/cat-airguns_QUU5YAuhX.jpg"}
                   alt={c.name}

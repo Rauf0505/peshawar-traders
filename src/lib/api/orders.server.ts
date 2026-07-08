@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { eq, desc, getTableColumns } from "drizzle-orm";
 import { getDb } from "../db/connection.server";
@@ -20,20 +19,7 @@ const cartItemSchema = z.object({
   quantity: z.number().min(1),
 });
 
-export const createOrder = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      customerName: z.string().min(1, "Name is required"),
-      email: z.string().email("Valid email is required"),
-      phone: z.string().min(1, "Phone is required"),
-      address: z.string().min(1, "Address is required"),
-      city: z.string().min(1, "City is required"),
-      paymentMethod: z.enum(["cod", "bank_transfer"]),
-      notes: z.string().optional(),
-      items: z.array(cartItemSchema).min(1, "Cart is empty"),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function createOrder({ data }: { data: any }) {
     const db = await getDb();
     const total = data.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const orderNumber = `WC-${Date.now()}`;
@@ -71,11 +57,9 @@ export const createOrder = createServerFn({ method: "POST" })
       orderId: order.id,
       total: order.total,
     };
-  });
+  }
 
-export const getOrders = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string() }))
-  .handler(async ({ data }) => {
+export async function getOrders({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const rows = await db
@@ -83,11 +67,9 @@ export const getOrders = createServerFn({ method: "POST" })
       .from(orders)
       .orderBy(desc(orders.createdAt));
     return rows;
-  });
+  }
 
-export const getOrderById = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string(), id: z.number() }))
-  .handler(async ({ data }) => {
+export async function getOrderById({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const [order] = await db
@@ -104,17 +86,9 @@ export const getOrderById = createServerFn({ method: "POST" })
       .orderBy(orderItems.id);
 
     return { ...order, items };
-  });
+  }
 
-export const updateOrderStatus = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-      status: z.enum(orderStatuses),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function updateOrderStatus({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     await db
@@ -122,4 +96,4 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       .set({ status: data.status, updatedAt: new Date() })
       .where(eq(orders.id, data.id));
     return { success: true };
-  });
+  }

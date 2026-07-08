@@ -1,8 +1,10 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { Reveal } from "./Reveal";
-import { getFiveStarReviews } from "@/lib/api/reviews.server";
+import { getFiveStarReviews } from "@/lib/api-client";
 
 const mockReviews = [
   {

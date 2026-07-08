@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
 import { getDb } from "../db/connection.server";
@@ -28,9 +27,7 @@ function requireAuth(token: string) {
   return user;
 }
 
-export const getProductReviews = createServerFn({ method: "GET" })
-  .validator(z.object({ productId: z.number() }))
-  .handler(async ({ data }) => {
+export async function getProductReviews({ data }: { data: any }) {
     const db = await getDb();
     const rows = await db
       .select()
@@ -38,20 +35,9 @@ export const getProductReviews = createServerFn({ method: "GET" })
       .where(eq(productReviews.productId, data.productId))
       .orderBy(desc(productReviews.createdAt));
     return rows;
-  });
+  }
 
-export const createReview = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      productId: z.number(),
-      reviewerName: z.string().min(1),
-      reviewerEmail: z.string().email().optional().or(z.literal("")),
-      rating: z.number().min(1).max(5),
-      title: z.string().optional(),
-      comment: z.string().min(1),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function createReview({ data }: { data: any }) {
     const db = await getDb();
     const now = new Date().toISOString();
     const [result] = await db
@@ -70,11 +56,9 @@ export const createReview = createServerFn({ method: "POST" })
 
     await updateProductAverageRating(db, data.productId);
     return result;
-  });
+  }
 
-export const getAllReviews = createServerFn({ method: "GET" })
-  .validator(z.object({ token: z.string() }))
-  .handler(async ({ data }) => {
+export async function getAllReviews({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const rows = await db
@@ -82,21 +66,9 @@ export const getAllReviews = createServerFn({ method: "GET" })
       .from(productReviews)
       .orderBy(desc(productReviews.createdAt));
     return rows;
-  });
+  }
 
-export const updateReview = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-      reviewerName: z.string().min(1),
-      reviewerEmail: z.string().email().optional().or(z.literal("")),
-      rating: z.number().min(1).max(5),
-      title: z.string().optional(),
-      comment: z.string().min(1),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function updateReview({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const [result] = await db
@@ -116,16 +88,9 @@ export const updateReview = createServerFn({ method: "POST" })
       await updateProductAverageRating(db, result.productId);
     }
     return result;
-  });
+  }
 
-export const deleteReview = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      id: z.number(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function deleteReview({ data }: { data: any }) {
     requireAuth(data.token);
     const db = await getDb();
     const review = await db
@@ -140,10 +105,9 @@ export const deleteReview = createServerFn({ method: "POST" })
       await updateProductAverageRating(db, review[0].productId);
     }
     return { success: true };
-  });
+  }
 
-export const getFiveStarReviews = createServerFn({ method: "GET" })
-  .handler(async () => {
+export async function getFiveStarReviews() {
     const db = await getDb();
     const rows = await db
       .select({
@@ -161,4 +125,4 @@ export const getFiveStarReviews = createServerFn({ method: "GET" })
       .orderBy(desc(productReviews.createdAt))
       .limit(30);
     return rows;
-  });
+  }

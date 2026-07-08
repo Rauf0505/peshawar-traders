@@ -4,7 +4,7 @@ import { getServerConfig } from "../config.server";
 import { eq } from "drizzle-orm";
 
 async function seed() {
-  const db = getDb();
+  const db = await getDb();
   const config = getServerConfig();
 
   const [existingUser] = await db

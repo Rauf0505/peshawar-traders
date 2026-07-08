@@ -1,3 +1,5 @@
+"use client";
+
 import { ShieldCheck, Truck, Lock, Headphones } from "lucide-react";
 import { Reveal, Stagger, itemVariants } from "./Reveal";
 import { motion } from "framer-motion";

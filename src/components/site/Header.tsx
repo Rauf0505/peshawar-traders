@@ -1,9 +1,11 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShoppingBag, Menu, X, ChevronDown, Globe, Tag, Grid3X3, Home, Info, Phone, MapPin } from "lucide-react";
-import { Link, useRouter } from "@tanstack/react-router";
-import { getBrands } from "@/lib/api/brands.server";
-import { getCategoriesWithSubcategories } from "@/lib/api/products.server";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { getBrands, getCategoriesWithSubcategories } from "@/lib/api-client";
 import { COUNTRY_CODE, getFlagEmoji } from "@/lib/countries";
 import { useCart } from "@/lib/cart-context";
 const LOGO_IMG = "https://ik.imagekit.io/chaudaryrauf/wildwood/site/logo_FQb_afTiw.png";
@@ -120,7 +122,6 @@ export function Header() {
   const [brands, setBrands] = useState<any[]>([]);
   const [productsMenu, setProductsMenu] = useState<any[]>([]);
   const { itemCount, openCart } = useCart();
-  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -134,11 +135,12 @@ export function Header() {
     getCategoriesWithSubcategories().then(setProductsMenu);
   }, []);
 
+  const pathname = usePathname();
+
   // Close mobile menu on route change
   useEffect(() => {
-    const unsub = router.subscribe("onResolved", () => setMobileOpen(false));
-    return unsub;
-  }, [router]);
+    setMobileOpen(false);
+  }, [pathname]);
 
   // Group brands by country for dropdown
   const brandsByCountry = brands.reduce<Record<string, any[]>>((acc, b) => {
@@ -159,7 +161,7 @@ export function Header() {
       >
         <div className="container-x flex h-20 items-center justify-between gap-6">
           {/* Logo */}
-          <Link to="/" className="flex items-center shrink-0">
+          <Link href="/" className="flex items-center shrink-0">
             <img src={LOGO_IMG} alt="Peshawar Traders" className="h-16 w-auto" />
           </Link>
 
@@ -167,7 +169,7 @@ export function Header() {
           <nav className="hidden lg:flex items-center gap-3">
             {/* Home */}
             <Link
-              to="/"
+              href="/"
               className="relative px-3 py-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-px after:w-0 after:bg-primary hover:after:w-[calc(100%-24px)] after:transition-all after:duration-300"
             >
               Home
@@ -180,7 +182,7 @@ export function Header() {
                   <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
                     By Country of Origin
                   </span>
-                  <Link to="/brands" className="text-xs text-primary font-semibold hover:underline">
+                  <Link href="/brands" className="text-xs text-primary font-semibold hover:underline">
                     All Brands →
                   </Link>
                 </div>
@@ -198,8 +200,7 @@ export function Header() {
                         {cBrands.map((b) => (
                           <Link
                             key={b.id}
-                            to="/brands/$slug"
-                            params={{ slug: b.slug }}
+                            href={'/brands/' + b.slug}
                             className="block px-4 py-1.5 text-sm font-medium text-foreground hover:text-primary transition-colors rounded-lg hover:bg-secondary"
                           >
                             {b.name}
@@ -225,8 +226,7 @@ export function Header() {
                     {productsMenu.map((cat: any) => (
                       <div key={cat.id} className="flex flex-col">
                         <Link
-                          to="/products"
-                          search={{ category: cat.slug }}
+                          href={`/products?category=${cat.slug}`}
                           className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
                         >
                           {cat.name}
@@ -235,8 +235,7 @@ export function Header() {
                         {cat.subcategories?.map((sub: any) => (
                           <Link
                             key={sub.id}
-                            to="/products"
-                            search={{ subcategory: sub.slug }}
+                            href={`/products?subcategory=${sub.slug}`}
                             className="px-4 py-1.5 text-sm text-foreground/80 hover:text-primary rounded-lg hover:bg-secondary transition-colors"
                           >
                             {sub.name}
@@ -248,7 +247,7 @@ export function Header() {
                 )}
                 <div className="border-t border-border mt-2 pt-2 px-4">
                   <Link
-                    to="/products"
+                    href="/products"
                     className="text-xs text-primary font-semibold hover:underline"
                   >
                     View all products →
@@ -259,7 +258,7 @@ export function Header() {
 
             {/* About */}
             <Link
-              to="/about"
+              href="/about"
               className="relative px-3 py-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-px after:w-0 after:bg-primary hover:after:w-[calc(100%-24px)] after:transition-all after:duration-300"
             >
               About Us
@@ -267,7 +266,7 @@ export function Header() {
 
             {/* Contact */}
             <Link
-              to="/contact"
+              href="/contact"
               className="relative px-3 py-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-px after:w-0 after:bg-primary hover:after:w-[calc(100%-24px)] after:transition-all after:duration-300"
             >
               Contact Us
@@ -275,7 +274,7 @@ export function Header() {
 
             {/* Track Order */}
             <Link
-              to="/track-order"
+              href="/track-order"
               className="relative flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-px after:w-0 after:bg-primary hover:after:w-[calc(100%-24px)] after:transition-all after:duration-300"
             >
               <MapPin className="h-3.5 w-3.5" />
@@ -286,8 +285,7 @@ export function Header() {
           {/* Actions */}
           <div className="flex items-center gap-1.5 shrink-0">
             <Link
-              to="/products"
-              search={{ q: "" }}
+              href="/products"
               className="hidden sm:grid place-items-center h-10 w-10 rounded-full hover:bg-muted transition"
               aria-label="Search products"
             >
@@ -348,7 +346,7 @@ export function Header() {
               {/* Nav */}
               <nav className="flex-1 overflow-y-auto px-5 py-4">
                 <Link
-                  to="/"
+                  href="/"
                   className="flex items-center gap-3 py-4 text-base font-medium border-b border-border/60"
                 >
                   <Home className="h-5 w-5 text-muted-foreground" />
@@ -359,29 +357,27 @@ export function Header() {
                   {brands.map((b) => (
                     <Link
                       key={b.id}
-                      to="/brands/$slug"
-                      params={{ slug: b.slug }}
+                      href={`/brands/${b.slug}`}
                       className="block py-2 text-sm text-foreground/80 hover:text-primary transition-colors"
                     >
                       {b.name}
                     </Link>
                   ))}
-                  <Link to="/brands" className="block py-2 text-sm text-primary font-semibold">
+                  <Link href="/brands" className="block py-2 text-sm text-primary font-semibold">
                     All Brands →
                   </Link>
                 </MobileSection>
 
                 <MobileSection icon={Grid3X3} label="Products">
                   {productsMenu.length === 0 ? (
-                    <Link to="/products" className="block py-2 text-sm text-foreground/80 hover:text-primary transition-colors">
+                    <Link href="/products" className="block py-2 text-sm text-foreground/80 hover:text-primary transition-colors">
                       All Products
                     </Link>
                   ) : (
                     productsMenu.map((cat: any) => (
                       <div key={cat.id} className="py-1">
                         <Link
-                          to="/products"
-                          search={{ category: cat.slug }}
+                          href={`/products?category=${cat.slug}`}
                           className="block py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
                         >
                           {cat.name}
@@ -389,8 +385,7 @@ export function Header() {
                         {cat.subcategories?.map((sub: any) => (
                           <Link
                             key={sub.id}
-                            to="/products"
-                            search={{ subcategory: sub.slug }}
+                            href={`/products?subcategory=${sub.slug}`}
                             className="block py-1.5 pl-3 text-sm text-foreground/80 hover:text-primary transition-colors"
                           >
                             {sub.name}
@@ -399,13 +394,13 @@ export function Header() {
                       </div>
                     ))
                   )}
-                  <Link to="/products" className="block py-2 text-sm text-primary font-semibold">
+                  <Link href="/products" className="block py-2 text-sm text-primary font-semibold">
                     All Products →
                   </Link>
                 </MobileSection>
 
                 <Link
-                  to="/about"
+                  href="/about"
                   className="flex items-center gap-3 py-4 text-base font-medium border-b border-border/60"
                 >
                   <Info className="h-5 w-5 text-muted-foreground" />
@@ -413,7 +408,7 @@ export function Header() {
                 </Link>
 
                 <Link
-                  to="/contact"
+                  href="/contact"
                   className="flex items-center gap-3 py-4 text-base font-medium border-b border-border/60"
                 >
                   <Phone className="h-5 w-5 text-muted-foreground" />
@@ -421,7 +416,7 @@ export function Header() {
                 </Link>
 
                 <Link
-                  to="/track-order"
+                  href="/track-order"
                   className="flex items-center gap-3 py-4 text-base font-medium border-b border-border/60"
                 >
                   <MapPin className="h-5 w-5 text-muted-foreground" />

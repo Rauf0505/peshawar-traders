@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { verifyToken } from "./auth.server";
 import { uploadImage as ikUpload, deleteImage as ikDelete } from "./imagekit.server";
@@ -9,45 +8,20 @@ function requireAuth(token: string) {
   return user;
 }
 
-export const uploadProductImage = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      base64: z.string(),
-      fileName: z.string(),
-      folder: z.string().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function uploadProductImage({ data }: { data: any }) {
     requireAuth(data.token);
     const result = await ikUpload(data.base64, data.fileName, data.folder ?? "products");
     return result;
-  });
+  }
 
-export const uploadBrandImage = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      base64: z.string(),
-      fileName: z.string(),
-      folder: z.string().optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function uploadBrandImage({ data }: { data: any }) {
     requireAuth(data.token);
     const result = await ikUpload(data.base64, data.fileName, data.folder ?? "brands");
     return result;
-  });
+  }
 
-export const deleteProductImage = createServerFn({ method: "POST" })
-  .validator(
-    z.object({
-      token: z.string(),
-      fileId: z.string(),
-    }),
-  )
-  .handler(async ({ data }) => {
+export async function deleteProductImage({ data }: { data: any }) {
     requireAuth(data.token);
     await ikDelete(data.fileId);
     return { success: true };
-  });
+  }

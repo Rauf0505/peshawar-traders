@@ -1,4 +1,6 @@
-import { Link } from "@tanstack/react-router";
+"use client";
+
+import Link from "next/link";
 import { Star, Eye, ShoppingBag, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -24,7 +26,7 @@ export function ProductCard({ product: p, index }: Props) {
 
   return (
     <motion.div key={p.sku} variants={itemVariants}>
-      <Link to="/product/$id" params={{ id: p.sku }} className="group block">
+      <Link href={`/product/${p.sku}`} className="group block">
         <div className="relative">
           <div className="relative aspect-square overflow-hidden bg-background rounded-md">
             {p.images?.[0] && (

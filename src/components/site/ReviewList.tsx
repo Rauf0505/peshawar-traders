@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { StarRating } from "./StarRating";
 import { MessageSquare, Clock, ChevronLeft, ChevronRight } from "lucide-react";

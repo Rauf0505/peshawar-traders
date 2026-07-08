@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/lib/cart-context";
@@ -23,7 +23,7 @@ export function CartDrawer() {
             <p className="font-medium text-foreground">Your cart is empty</p>
             <p className="text-sm text-muted-foreground mt-1">Add some products to get started.</p>
             <Link
-              to="/products"
+              href="/products"
               onClick={closeCart}
               className="mt-6 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-5 py-2.5 text-xs uppercase tracking-wider font-semibold hover:bg-charcoal transition"
             >
@@ -42,8 +42,7 @@ export function CartDrawer() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <Link
-                      to="/product/$id"
-                      params={{ id: item.sku }}
+                      href={`/product/${item.sku}`}
                       onClick={closeCart}
                       className="text-sm font-medium text-foreground hover:text-primary transition line-clamp-2"
                     >
@@ -86,14 +85,14 @@ export function CartDrawer() {
               <p className="text-xs text-muted-foreground">Shipping calculated at checkout.</p>
               <div className="flex gap-2">
                 <Link
-                  to="/cart"
+                  href="/cart"
                   onClick={closeCart}
                   className="flex-1 inline-flex items-center justify-center rounded-md border border-border text-foreground py-2.5 text-xs uppercase tracking-wider font-semibold hover:bg-secondary transition"
                 >
                   View Cart
                 </Link>
                 <Link
-                  to="/checkout"
+                  href="/checkout"
                   onClick={closeCart}
                   className="flex-1 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground py-2.5 text-xs uppercase tracking-wider font-semibold hover:bg-charcoal transition"
                 >

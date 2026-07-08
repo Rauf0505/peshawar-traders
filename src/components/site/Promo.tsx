@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 const PROMO_IMG = "https://ik.imagekit.io/chaudaryrauf/wildwood/site/promo_oZDWG3OTK.jpg";

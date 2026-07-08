@@ -1,8 +1,10 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { StarRating } from "./StarRating";
 import { ReviewList } from "./ReviewList";
 import { ReviewForm } from "./ReviewForm";
-import { getProductReviews } from "@/lib/api/reviews.server";
+import { getProductReviews } from "@/lib/api-client";
 import { Star, MessageSquare, ChevronDown } from "lucide-react";
 
 export function ProductReviews({

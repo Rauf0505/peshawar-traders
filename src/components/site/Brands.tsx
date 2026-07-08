@@ -1,7 +1,9 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { Reveal } from "./Reveal";
-import { getBrands } from "@/lib/api/brands.server";
+import { getBrands } from "@/lib/api-client";
 import { COUNTRY_CODE, getFlagEmoji } from "@/lib/countries";
 
 export function Brands() {
@@ -38,7 +40,7 @@ export function Brands() {
               </h2>
             </div>
             <Link
-              to="/brands"
+              href="/brands"
               className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
             >
               View All Brands →
@@ -48,8 +50,7 @@ export function Brands() {
             {displayed.map((b) => (
               <Link
                 key={b.id}
-                to="/brands/$slug"
-                params={{ slug: b.slug }}
+                href={`/brands/${b.slug}`}
                 className="group block"
               >
                 <div className="aspect-square rounded-xl bg-secondary border border-border/60 hover:border-primary transition-all duration-300 flex flex-col items-center justify-center p-6 text-center">
@@ -66,7 +67,7 @@ export function Brands() {
           </div>
           <div className="mt-10 text-center sm:hidden">
             <Link
-              to="/brands"
+              href="/brands"
               className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
             >
               View All Brands →

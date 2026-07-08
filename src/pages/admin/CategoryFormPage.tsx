@@ -136,7 +136,7 @@ export function CategoryFormPage({ editId }: Props) {
               required
             />
             {fieldErrors.slug && <p className="text-xs text-red-400 mt-1">{fieldErrors.slug}</p>}
-            <p className="text-xs text-zinc-600 mt-1">Used in URLs: /shop/{form.slug || "…"}</p>
+            <p className="text-xs text-zinc-600 mt-1">Used in URLs: /products?category={form.slug || "…"}</p>
           </div>
         </div>
 

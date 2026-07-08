@@ -49,3 +49,4 @@ drizzle/
 *.zip
 *.tar.gz
 *.rar
+.vercel/

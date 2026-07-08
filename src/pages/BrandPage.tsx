@@ -1,46 +1,21 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { getBrandBySlug } from "@/lib/api/brands.server";
 import { COUNTRY_CODE, getFlagEmoji } from "@/lib/countries";
-import { ArrowRight, Star, Globe, MapPin } from "lucide-react";
-import { Reveal, Stagger, itemVariants } from "@/components/site/Reveal";
-import { motion } from "framer-motion";
+import { ArrowRight, MapPin } from "lucide-react";
+import { Reveal, Stagger } from "@/components/site/Reveal";
+import { ProductCard } from "@/components/site/ProductCard";
 
 interface Props {
-  slug: string;
+  brand: any;
+  products: any[];
 }
 
-export function BrandPage({ slug }: Props) {
-  const navigate = useNavigate();
-  const [brand, setBrand] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getBrandBySlug({ data: { slug } }).then((b) => {
-      if (!b) navigate({ to: "/brands" });
-      setBrand(b);
-      setLoading(false);
-    });
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <div className="bg-background text-foreground overflow-x-hidden">
-        <Header />
-        <main className="pt-20 min-h-screen flex items-center justify-center">
-          <div className="text-muted-foreground animate-pulse">Loading brand…</div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!brand) return null;
+export function BrandPage({ brand, products }: Props) {
+  const featured = brand.featuredProducts || [];
 
   return (
-    <div className="bg-background text-foreground overflow-x-hidden">
+    <div className="bg-background text-foreground">
       <Header />
       <main className="pt-20">
         {/* Hero */}
@@ -98,7 +73,7 @@ export function BrandPage({ slug }: Props) {
               <div className="mt-8">
                 <Link
                   to="/products"
-                  search={{ brand: slug }}
+                  search={{ brand: brand.slug }}
                   className="group inline-flex items-center gap-3 bg-primary text-primary-foreground px-8 py-4 text-sm font-semibold tracking-wide uppercase rounded-md hover:bg-charcoal transition-all duration-300"
                 >
                   Explore All {brand.name} Products
@@ -110,7 +85,7 @@ export function BrandPage({ slug }: Props) {
         </section>
 
         {/* Featured Products */}
-        {brand.featuredProducts && brand.featuredProducts.length > 0 && (
+        {featured.length > 0 && (
           <section className="py-20 md:py-28 bg-secondary">
             <div className="container-x">
               <Reveal>
@@ -123,7 +98,7 @@ export function BrandPage({ slug }: Props) {
                   </div>
                   <Link
                     to="/products"
-                    search={{ brand: slug }}
+                    search={{ brand: brand.slug }}
                     className="group inline-flex items-center gap-2 text-sm font-semibold text-foreground/80 hover:text-primary transition"
                   >
                     View all products
@@ -133,82 +108,48 @@ export function BrandPage({ slug }: Props) {
               </Reveal>
 
               <Stagger className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                {brand.featuredProducts.map((p: any) => (
-                  <motion.div key={p.sku} variants={itemVariants}>
-                    <Link to="/product/$id" params={{ id: p.sku }} className="group block">
-                      <div className="relative aspect-square overflow-hidden bg-background rounded-md border border-border/40">
-                        {p.images[0] && (
-                          <img
-                            src={p.images[0]}
-                            alt={p.name}
-                            loading="lazy"
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          />
-                        )}
-                        {p.comparePrice && (
-                          <span className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold rounded bg-destructive text-destructive-foreground">
-                            Sale {Math.round(((p.comparePrice - p.price) / p.comparePrice) * 100)}%
-                          </span>
-                        )}
-                        {p.stockStatus === "On Demand" && (
-                          <span className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold rounded bg-purple-600 text-white">
-                            On Demand
-                          </span>
-                        )}
-                        {p.stockStatus === "Out of Stock" && (
-                          <span className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold rounded bg-red-600 text-white">
-                            Out of Stock
-                          </span>
-                        )}
-                        {p.stockStatus === "Low Stock" && (
-                          <span className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold rounded bg-accent text-accent-foreground">
-                            Low Stock
-                          </span>
-                        )}
-                      </div>
-                      <div className="pt-3 sm:pt-4">
-                        <div className="flex items-center gap-1 mb-1.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${i < Math.round(p.rating ?? 0) ? "fill-accent text-accent" : "text-border"}`} />
-                          ))}
-                          <span className="text-[10px] text-muted-foreground ml-1">{p.rating?.toFixed(1) ?? "0.0"}</span>
-                        </div>
-                        <h3 className="font-display text-sm sm:text-base font-medium text-foreground group-hover:text-primary transition line-clamp-2">
-                          {p.name}
-                        </h3>
-                        {p.description && (
-                          <p className="mt-1 text-xs text-muted-foreground line-clamp-2 leading-relaxed hidden sm:block">
-                            {p.description}
-                          </p>
-                        )}
-<div className="mt-2 flex items-baseline gap-2 flex-wrap">
-                           <span className="font-semibold text-sm sm:text-base">${p.price}</span>
-                           {p.comparePrice && (
-                             <>
-                               <span className="text-xs text-muted-foreground line-through">${p.comparePrice}</span>
-                               <span className="text-xs font-semibold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">
-                                 {Math.round(((p.comparePrice - p.price) / p.comparePrice) * 100)}% OFF
-                               </span>
-                             </>
-                           )}
-                         </div>
-                      </div>
-                    </Link>
-                  </motion.div>
+                {featured.map((p: any) => (
+                  <ProductCard key={p.sku} product={p} />
                 ))}
               </Stagger>
 
-              {/* Explore All button */}
               <div className="mt-16 text-center">
                 <Link
                   to="/products"
-                  search={{ brand: slug }}
+                  search={{ brand: brand.slug }}
                   className="group inline-flex items-center gap-3 border border-border hover:border-primary text-foreground hover:text-primary px-8 py-4 text-sm font-semibold tracking-wide uppercase rounded-md transition-all duration-300"
                 >
                   Explore All {brand.name} Products
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* All Products */}
+        {products.length > 0 && (
+          <section className="py-20 md:py-28 bg-background">
+            <div className="container-x">
+              <Reveal>
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+                  <div>
+                    <span className="eyebrow">All Products</span>
+                    <h2 className="mt-4 font-display text-4xl md:text-5xl font-medium leading-[1.05] max-w-xl">
+                      Every <span className="italic text-primary">{brand.name}</span> Product
+                    </h2>
+                    <p className="mt-3 text-muted-foreground max-w-lg">
+                      Browse the complete {brand.name} collection — {products.length} product{products.length > 1 ? "s" : ""} available.
+                    </p>
+                  </div>
+                </div>
+              </Reveal>
+
+              <Stagger className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {products.map((p: any) => (
+                  <ProductCard key={p.sku} product={p} />
+                ))}
+              </Stagger>
             </div>
           </section>
         )}

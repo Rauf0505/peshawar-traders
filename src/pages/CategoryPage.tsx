@@ -3,10 +3,14 @@ import { Link, notFound } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { getCategories, getProductsByCategory } from "@/lib/api/products.server";
-import { Star, ShoppingBag, Eye } from "lucide-react";
+import { Star, ShoppingBag, Eye, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useCart } from "@/lib/cart-context";
+import { getWhatsAppLink } from "@/lib/whatsapp";
 
 export function CategoryPage({ categorySlug }: { categorySlug: string }) {
+  const { addItem } = useCart();
   const [category, setCategory] = useState<any>(null);
   const [categoryProducts, setCategoryProducts] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -94,9 +98,29 @@ export function CategoryPage({ categorySlug }: { categorySlug: string }) {
                           </span>
                         )}
                         <div className="absolute inset-x-2 bottom-2 sm:inset-x-3 sm:bottom-3 translate-y-3 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400 flex gap-1.5 sm:gap-2">
-                          <span className="flex-1 inline-flex items-center justify-center gap-1 sm:gap-2 bg-primary text-primary-foreground py-2 sm:py-3 text-[10px] sm:text-xs uppercase tracking-[0.18em] font-semibold rounded hover:bg-charcoal transition cursor-pointer">
-                            <ShoppingBag className="h-3.5 w-3.5" /> <span className="hidden xs:inline">Add</span>
-                          </span>
+                          {product.stockStatus === "On Demand" ? (
+                            <a
+                              href={getWhatsAppLink(product)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex-1 inline-flex items-center justify-center gap-1 sm:gap-2 bg-green-600 text-white py-2 sm:py-3 text-[10px] sm:text-xs uppercase tracking-[0.18em] font-semibold rounded hover:bg-green-700 transition cursor-pointer"
+                            >
+                              <MessageCircle className="h-3.5 w-3.5" /> <span className="hidden xs:inline">WhatsApp</span>
+                            </a>
+                          ) : product.stockStatus !== "Out of Stock" ? (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                addItem(product);
+                                toast.success(`${product.name} added to cart`);
+                              }}
+                              className="flex-1 inline-flex items-center justify-center gap-1 sm:gap-2 bg-primary text-primary-foreground py-2 sm:py-3 text-[10px] sm:text-xs uppercase tracking-[0.18em] font-semibold rounded hover:bg-charcoal transition cursor-pointer"
+                            >
+                              <ShoppingBag className="h-3.5 w-3.5" /> <span className="hidden xs:inline">Add</span>
+                            </button>
+                          ) : null}
                           <span className="grid place-items-center w-9 sm:w-11 bg-background rounded hover:bg-accent hover:text-accent-foreground transition cursor-pointer">
                             <Eye className="h-4 w-4" />
                           </span>
@@ -110,11 +134,11 @@ export function CategoryPage({ categorySlug }: { categorySlug: string }) {
                           {product.name}
                         </h3>
                         <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1.5 sm:gap-2 flex-wrap">
-                          <span className="text-foreground font-semibold text-sm sm:text-base">${product.price}</span>
+                          <span className="text-foreground font-semibold text-sm sm:text-base">Rs.{product.price}</span>
                           {product.comparePrice && (
                             <>
                               <span className="text-xs sm:text-sm text-muted-foreground line-through">
-                                ${product.comparePrice}
+                                Rs.{product.comparePrice}
                               </span>
                               <span className="text-xs sm:text-sm font-semibold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">
                                 {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF

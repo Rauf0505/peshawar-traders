@@ -136,7 +136,7 @@ export function ProductListPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-zinc-400">{p.sku}</td>
-                      <td className="px-4 py-3">${p.price}</td>
+                      <td className="px-4 py-3">Rs.{p.price}</td>
                       <td className="px-4 py-3">
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full ${

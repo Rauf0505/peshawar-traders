@@ -11,7 +11,10 @@ import {
   Tag,
   Grid3X3,
   List,
+  ShoppingCart,
+  MessageSquare,
 } from "lucide-react";
+
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -123,6 +126,20 @@ export function AdminLayout() {
           >
             <Tag className="h-4 w-4" />
             Brands
+          </Link>
+          <Link
+            to="/admin/orders"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition ${isActive("/admin/orders")}`}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Orders
+          </Link>
+          <Link
+            to="/admin/reviews"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition ${isActive("/admin/reviews")}`}
+          >
+            <MessageSquare className="h-4 w-4" />
+            Reviews
           </Link>
           <Link
             to="/admin/home-control"

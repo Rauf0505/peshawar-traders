@@ -6,6 +6,7 @@ import {
   real,
   primaryKey,
   uniqueIndex,
+  timestamp,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -103,9 +104,48 @@ export const products = pgTable("products", {
   updatedAt: text("updated_at").default(sql`current_timestamp`),
 });
 
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  orderNumber: text("order_number").notNull().unique(),
+  customerName: text("customer_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  paymentMethod: text("payment_method").notNull().default("cod"),
+  notes: text("notes"),
+  status: text("status").notNull().default("pending"),
+  total: real("total").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const orderItems = pgTable("order_items", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  productSku: text("product_sku").notNull(),
+  productName: text("product_name").notNull(),
+  quantity: integer("quantity").notNull(),
+  unitPrice: real("unit_price").notNull(),
+  totalPrice: real("total_price").notNull(),
+});
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   createdAt: text("created_at").default(sql`current_timestamp`),
 });
+
+export const productReviews = pgTable("product_reviews", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id").notNull().references(() => products.id),
+  reviewerName: text("reviewer_name").notNull(),
+  reviewerEmail: text("reviewer_email"),
+  rating: integer("rating").notNull(),
+  title: text("title"),
+  comment: text("comment").notNull(),
+  createdAt: text("created_at").default(sql`current_timestamp`),
+  updatedAt: text("updated_at").default(sql`current_timestamp`),
+});
+

@@ -157,6 +157,7 @@ export const getProductsFiltered = createServerFn({ method: "GET" })
       category: z.string().optional(),
       brand: z.string().optional(),
       country: z.string().optional(),
+      subcategory: z.string().optional(),
       search: z.string().optional(),
       sort: z.string().optional(),
     }),
@@ -173,6 +174,9 @@ export const getProductsFiltered = createServerFn({ method: "GET" })
     }
     if (data.country) {
       conditions.push(eq(brands.country, data.country));
+    }
+    if (data.subcategory) {
+      conditions.push(eq(subcategories.slug, data.subcategory));
     }
     if (data.search) {
       const pattern = `%${data.search}%`;

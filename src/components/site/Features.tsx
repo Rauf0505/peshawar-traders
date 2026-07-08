@@ -21,18 +21,20 @@ export function Features() {
             </h2>
           </div>
         </Reveal>
-        <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Stagger className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
           {items.map((it) => (
             <motion.div
               key={it.title}
               variants={itemVariants}
-              className="group p-8 border border-border bg-card hover:border-primary hover:-translate-y-1 rounded-md transition-all duration-500"
+              className="group flex flex-row items-start gap-4 p-4 border border-border bg-card hover:border-primary hover:-translate-y-1 rounded-md transition-all duration-500 sm:flex-col sm:p-8 sm:gap-0"
             >
-              <div className="grid h-14 w-14 place-items-center rounded-full bg-secondary text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-500">
-                <it.icon className="h-6 w-6" strokeWidth={1.5} />
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-secondary text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-500 sm:h-14 sm:w-14">
+                <it.icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.5} />
               </div>
-              <h3 className="mt-6 font-display text-2xl font-medium">{it.title}</h3>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{it.text}</p>
+              <div className="flex-1 min-w-0 sm:mt-6">
+                <h3 className="font-display text-lg font-medium sm:text-2xl">{it.title}</h3>
+                <p className="mt-1 text-xs text-muted-foreground leading-normal sm:mt-3 sm:text-sm sm:leading-relaxed">{it.text}</p>
+              </div>
             </motion.div>
           ))}
         </Stagger>

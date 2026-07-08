@@ -1,23 +1,31 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { getBrands } from "@/lib/api/brands.server";
 import { COUNTRY_CODE, getFlagEmoji } from "@/lib/countries";
-import { ArrowUpRight, Globe } from "lucide-react";
+import { ArrowUpRight, Globe, Search, X } from "lucide-react";
 import { Reveal, Stagger, itemVariants } from "@/components/site/Reveal";
 import { motion } from "framer-motion";
 
-export function BrandsPage() {
-  const [brands, setBrands] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  brands: any[];
+}
 
-  useEffect(() => {
-    getBrands().then((b) => { setBrands(b); setLoading(false); });
-  }, []);
+export function BrandsPage({ brands }: Props) {
+  const [search, setSearch] = useState("");
 
-  // Group brands by country
-  const byCountry = brands.reduce<Record<string, any[]>>((acc, brand) => {
+  const filtered = useMemo(() => {
+    if (!search.trim()) return brands;
+    const q = search.toLowerCase();
+    return brands.filter(
+      (b) =>
+        b.name.toLowerCase().includes(q) ||
+        b.country.toLowerCase().includes(q) ||
+        (b.description && b.description.toLowerCase().includes(q)),
+    );
+  }, [brands, search]);
+
+  const byCountry = filtered.reduce<Record<string, any[]>>((acc, brand) => {
     const c = brand.country || "Other";
     if (!acc[c]) acc[c] = [];
     acc[c].push(brand);
@@ -25,7 +33,7 @@ export function BrandsPage() {
   }, {});
 
   return (
-    <div className="bg-background text-foreground overflow-x-hidden">
+    <div className="bg-background text-foreground">
       <Header />
       <main className="pt-20">
         {/* Hero */}
@@ -38,25 +46,41 @@ export function BrandsPage() {
                 World's Finest <span className="italic text-primary">Brands</span>
               </h1>
               <p className="mt-6 text-white/60 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-                Premium airgun manufacturers from Turkey, Spain, China, and beyond — all in one place.
+                Premium airgun manufacturers from around the world — all in one place.
               </p>
             </Reveal>
           </div>
         </section>
 
-        {/* Brands Grid */}
+        {/* Search + Brands Grid */}
         <section className="py-20 md:py-28 bg-background">
           <div className="container-x">
-            {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="aspect-[4/3] rounded-lg bg-secondary animate-pulse" />
-                ))}
-              </div>
-            ) : brands.length === 0 ? (
+            {/* Search Bar */}
+            <div className="relative max-w-md mx-auto mb-16">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search brands by name, country, or description..."
+                className="w-full pl-10 pr-10 py-3 bg-secondary border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            {filtered.length === 0 ? (
               <div className="text-center py-20">
                 <Globe className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />
-                <p className="text-muted-foreground">No brands registered yet.</p>
+                <p className="text-muted-foreground">
+                  {search ? `No brands matching "${search}"` : "No brands registered yet."}
+                </p>
               </div>
             ) : (
               <div className="space-y-16">

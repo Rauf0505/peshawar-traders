@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ShoppingBag, Menu, X, ChevronDown, Globe, Tag, Grid3X3, Home, Info, Phone } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, ChevronDown, Globe, Tag, Grid3X3, Home, Info, Phone, MapPin } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { getBrands } from "@/lib/api/brands.server";
 import { getCategoriesWithSubcategories } from "@/lib/api/products.server";
 import { COUNTRY_CODE, getFlagEmoji } from "@/lib/countries";
+import { useCart } from "@/lib/cart-context";
 const LOGO_IMG = "https://ik.imagekit.io/chaudaryrauf/wildwood/site/logo_FQb_afTiw.png";
 
 // ─── Desktop Nav Item with Dropdown ─────────────────────────────────────────
@@ -118,6 +119,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [brands, setBrands] = useState<any[]>([]);
   const [productsMenu, setProductsMenu] = useState<any[]>([]);
+  const { itemCount, openCart } = useCart();
   const router = useRouter();
 
   useEffect(() => {
@@ -223,7 +225,8 @@ export function Header() {
                     {productsMenu.map((cat: any) => (
                       <div key={cat.id} className="flex flex-col">
                         <Link
-                          to={`/shop/${cat.slug}` as any}
+                          to="/products"
+                          search={{ category: cat.slug }}
                           className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
                         >
                           {cat.name}
@@ -232,7 +235,8 @@ export function Header() {
                         {cat.subcategories?.map((sub: any) => (
                           <Link
                             key={sub.id}
-                            to={`/shop/${cat.slug}` as any}
+                            to="/products"
+                            search={{ subcategory: sub.slug }}
                             className="px-4 py-1.5 text-sm text-foreground/80 hover:text-primary rounded-lg hover:bg-secondary transition-colors"
                           >
                             {sub.name}
@@ -268,6 +272,15 @@ export function Header() {
             >
               Contact Us
             </Link>
+
+            {/* Track Order */}
+            <Link
+              to="/track-order"
+              className="relative flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-foreground/80 hover:text-primary transition-colors after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-px after:w-0 after:bg-primary hover:after:w-[calc(100%-24px)] after:transition-all after:duration-300"
+            >
+              <MapPin className="h-3.5 w-3.5" />
+              Track Order
+            </Link>
           </nav>
 
           {/* Actions */}
@@ -281,13 +294,16 @@ export function Header() {
               <Search className="h-[18px] w-[18px]" />
             </Link>
             <button
+              onClick={openCart}
               className="relative grid place-items-center h-10 w-10 rounded-full hover:bg-muted transition"
               aria-label="Cart"
             >
               <ShoppingBag className="h-[18px] w-[18px]" />
-              <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                0
-              </span>
+              {itemCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {itemCount > 99 ? "99+" : itemCount}
+                </span>
+              )}
             </button>
             <button
               className="lg:hidden grid place-items-center h-10 w-10 rounded-full hover:bg-muted transition"
@@ -364,7 +380,8 @@ export function Header() {
                     productsMenu.map((cat: any) => (
                       <div key={cat.id} className="py-1">
                         <Link
-                          to={`/shop/${cat.slug}` as any}
+                          to="/products"
+                          search={{ category: cat.slug }}
                           className="block py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors"
                         >
                           {cat.name}
@@ -372,7 +389,8 @@ export function Header() {
                         {cat.subcategories?.map((sub: any) => (
                           <Link
                             key={sub.id}
-                            to={`/shop/${cat.slug}` as any}
+                            to="/products"
+                            search={{ subcategory: sub.slug }}
                             className="block py-1.5 pl-3 text-sm text-foreground/80 hover:text-primary transition-colors"
                           >
                             {sub.name}
@@ -400,6 +418,14 @@ export function Header() {
                 >
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   Contact Us
+                </Link>
+
+                <Link
+                  to="/track-order"
+                  className="flex items-center gap-3 py-4 text-base font-medium border-b border-border/60"
+                >
+                  <MapPin className="h-5 w-5 text-muted-foreground" />
+                  Track Order
                 </Link>
               </nav>
 

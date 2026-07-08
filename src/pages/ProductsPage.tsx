@@ -5,9 +5,12 @@ import { Footer } from "@/components/site/Footer";
 import { getProductsFiltered, getCountries } from "@/lib/api/brands.server";
 import { getCategories } from "@/lib/api/products.server";
 import { getBrands } from "@/lib/api/brands.server";
-import { Search, Star, ShoppingBag, Eye, SlidersHorizontal, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Star, ShoppingBag, Eye, SlidersHorizontal, X, ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
 import { COUNTRY_CODE, getFlagEmoji } from "@/lib/countries";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { useCart } from "@/lib/cart-context";
+import { getWhatsAppLink } from "@/lib/whatsapp";
 
 const sortOptions = [
   { value: "default", label: "Default" },
@@ -21,6 +24,7 @@ interface Filters {
   category?: string;
   brand?: string;
   country?: string;
+  subcategory?: string;
   q?: string;
   sort?: string;
 }
@@ -28,6 +32,7 @@ interface Filters {
 export function ProductsPage() {
   const search = useSearch({ from: "/products" }) as Filters;
   const navigate = useNavigate({ from: "/products" });
+  const { addItem } = useCart();
 
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -40,6 +45,7 @@ export function ProductsPage() {
     category: search.category,
     brand: search.brand,
     country: search.country,
+    subcategory: search.subcategory,
     q: search.q,
     sort: search.sort,
   };
@@ -50,7 +56,7 @@ export function ProductsPage() {
 
   const clearAll = () => navigate({ search: {} });
 
-  const activeFilterCount = [filters.category, filters.brand, filters.country, filters.q].filter(Boolean).length;
+  const activeFilterCount = [filters.category, filters.brand, filters.country, filters.subcategory, filters.q].filter(Boolean).length;
 
   useEffect(() => {
     Promise.all([getCategories(), getBrands(), getCountries()]).then(([cats, brs, cns]) => {
@@ -67,11 +73,12 @@ export function ProductsPage() {
         category: filters.category,
         brand: filters.brand,
         country: filters.country,
+        subcategory: filters.subcategory,
         search: filters.q,
         sort: filters.sort,
       },
     }).then((p) => { setProducts(p); setLoading(false); });
-  }, [filters.category, filters.brand, filters.country, filters.q, filters.sort]);
+  }, [filters.category, filters.brand, filters.country, filters.subcategory, filters.q, filters.sort]);
 
   const FilterSection = ({ title, children }: { title: string; children: React.ReactNode }) => {
     const [open, setOpen] = useState(true);
@@ -214,6 +221,12 @@ export function ProductsPage() {
                     <button onClick={() => setFilter("brand", undefined)}><X className="h-3 w-3" /></button>
                   </span>
                 )}
+                {filters.subcategory && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-primary/10 text-primary rounded-full border border-primary/20">
+                    {filters.subcategory.replace(/-/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                    <button onClick={() => setFilter("subcategory", undefined)}><X className="h-3 w-3" /></button>
+                  </span>
+                )}
                 {filters.country && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-primary/10 text-primary rounded-full border border-primary/20">
                     {COUNTRY_CODE[filters.country] ? getFlagEmoji(COUNTRY_CODE[filters.country]) : "🌐"} {filters.country}
@@ -326,10 +339,31 @@ export function ProductsPage() {
                               </span>
                             )}
                             <div className="absolute inset-x-2 bottom-2 sm:inset-x-3 sm:bottom-3 translate-y-3 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 flex gap-1.5">
-                              <button className="flex-1 inline-flex items-center justify-center gap-1 bg-primary text-primary-foreground py-2.5 text-[10px] sm:text-xs uppercase tracking-wider font-semibold rounded hover:bg-charcoal transition">
-                                <ShoppingBag className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Add to Cart</span>
-                              </button>
+                              {p.stockStatus === "On Demand" ? (
+                                <a
+                                  href={getWhatsAppLink(p)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="flex-1 inline-flex items-center justify-center gap-1 bg-green-600 text-white py-2.5 text-[10px] sm:text-xs uppercase tracking-wider font-semibold rounded hover:bg-green-700 transition"
+                                >
+                                  <MessageCircle className="h-3.5 w-3.5" />
+                                  <span className="hidden sm:inline">WhatsApp</span>
+                                </a>
+                              ) : p.stockStatus !== "Out of Stock" ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    addItem(p);
+                                    toast.success(`${p.name} added to cart`);
+                                  }}
+                                  className="flex-1 inline-flex items-center justify-center gap-1 bg-primary text-primary-foreground py-2.5 text-[10px] sm:text-xs uppercase tracking-wider font-semibold rounded hover:bg-charcoal transition"
+                                >
+                                  <ShoppingBag className="h-3.5 w-3.5" />
+                                  <span className="hidden sm:inline">Add to Cart</span>
+                                </button>
+                              ) : null}
                               <button className="grid place-items-center w-9 sm:w-11 bg-background rounded hover:bg-accent transition">
                                 <Eye className="h-4 w-4" />
                               </button>
@@ -349,11 +383,11 @@ export function ProductsPage() {
                             )}
                             <h3 className="font-display text-sm font-medium text-foreground group-hover:text-primary transition line-clamp-2">{p.name}</h3>
                             <div className="mt-1.5 flex items-baseline gap-2 flex-wrap">
-                              <span className="font-semibold text-sm">${p.price}</span>
+                              <span className="font-semibold text-sm">Rs.{p.price}</span>
                               {p.comparePrice && (
                                 <>
                                   <span className="text-xs text-muted-foreground line-through">
-                                    ${p.comparePrice}
+                                    Rs.{p.comparePrice}
                                   </span>
                                   <span className="text-xs font-semibold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">
                                     {Math.round(((p.comparePrice - p.price) / p.comparePrice) * 100)}% OFF

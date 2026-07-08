@@ -370,7 +370,7 @@ export function BrandFormPage({ editId }: Props) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-zinc-100 truncate">{p.name}</div>
-                      <div className="text-zinc-500 text-xs">{p.sku} · ${p.price}</div>
+                      <div className="text-zinc-500 text-xs">{p.sku} · Rs.{p.price}</div>
                     </div>
                   </button>
                 );

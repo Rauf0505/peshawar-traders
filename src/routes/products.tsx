@@ -6,6 +6,7 @@ const searchSchema = z.object({
   category: z.string().optional(),
   brand: z.string().optional(),
   country: z.string().optional(),
+  subcategory: z.string().optional(),
   q: z.string().optional(),
   sort: z.string().optional(),
 });

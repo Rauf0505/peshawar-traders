@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { Reveal, Stagger, itemVariants } from "./Reveal";
-import { getCategories } from "@/lib/api/products.server";
 const catImages: Record<string, string> = {
   "weapons-launchers": "https://ik.imagekit.io/chaudaryrauf/wildwood/categories/cat-airguns_QUU5YAuhX.jpg",
   "optics-lasers": "https://ik.imagekit.io/chaudaryrauf/wildwood/categories/cat-pellets_XFDJx1kuQ.jpg",
@@ -28,12 +26,7 @@ const catSpan: Record<string, string> = {
   "maintenance-tools": "col-span-2 md:col-span-1",
 };
 
-export function Categories() {
-  const [cats, setCats] = useState<any[]>([]);
-
-  useEffect(() => {
-    getCategories().then((data: any) => setCats(data));
-  }, []);
+export function Categories({ categories }: { categories: any[] }) {
 
   return (
     <section id="categories" className="py-24 md:py-32 bg-background">
@@ -53,14 +46,19 @@ export function Categories() {
         </Reveal>
 
         <Stagger>
+          {categories.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <p className="text-lg">No categories available yet.</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[280px]">
-            {cats.map((c: any) => (
+            {categories.map((c: any) => (
             <motion.div
               key={c.slug}
               variants={itemVariants}
               className={`group relative overflow-hidden rounded-md bg-charcoal h-full ${catSpan[c.slug] || ""}`}
             >
-              <Link to="/shop/$category" params={{ category: c.slug }} className="block h-full w-full">
+              <Link to="/products" search={{ category: c.slug }} className="block h-full w-full">
                 <img
                   src={catImages[c.slug] || "https://ik.imagekit.io/chaudaryrauf/wildwood/categories/cat-airguns_QUU5YAuhX.jpg"}
                   alt={c.name}
@@ -90,6 +88,7 @@ export function Categories() {
             </motion.div>
           ))}
           </div>
+          )}
         </Stagger>
       </div>
     </section>

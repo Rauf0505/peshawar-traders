@@ -9,8 +9,25 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { Brands } from "@/components/site/Brands";
 import { Newsletter } from "@/components/site/Newsletter";
 import { Footer } from "@/components/site/Footer";
+import { getCategories } from "@/lib/api/products.server";
+import { getHomePageProducts } from "@/lib/api/home-assignments.server";
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    let categories: any[] = [];
+    let initialProducts: any[] = [];
+    try {
+      categories = await getCategories();
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+    }
+    try {
+      initialProducts = await getHomePageProducts({ data: { tabSlug: "all" } });
+    } catch (err) {
+      console.error("Failed to load initial products:", err);
+    }
+    return { categories, initialProducts };
+  },
   head: () => ({
     meta: [
       { title: "Peshawar Traders — Premium Tactical & Outdoor Gear" },
@@ -39,13 +56,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { categories, initialProducts } = Route.useLoaderData();
   return (
     <div className="bg-background text-foreground overflow-x-hidden">
       <Header />
       <main className="pt-20">
         <Hero />
-        <Categories />
-        <Products />
+        <Categories categories={categories} />
+        <Products initialProducts={initialProducts} />
         <Promo />
         <Features />
         <Testimonials />

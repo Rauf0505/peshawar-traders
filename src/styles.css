@@ -83,3 +83,49 @@
   font-weight: 600;
   color: var(--color-accent);
 }
+
+/* ── Custom Scrollbar ─────────────────────────────────────── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.75 0.005 70) transparent;
+}
+
+/* Webkit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.82 0.008 70);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.68 0.012 70);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Dark surfaces (admin, dropdowns) */
+.dark ::-webkit-scrollbar-thumb,
+[class*="bg-zinc"] ::-webkit-scrollbar-thumb,
+[class*="bg-charcoal"] ::-webkit-scrollbar-thumb {
+  background: oklch(0.35 0.005 70);
+}
+[class*="bg-zinc"] ::-webkit-scrollbar-thumb:hover,
+[class*="bg-charcoal"] ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.45 0.008 70);
+}
+
+/* Utility: hide scrollbar entirely but keep scrollability */
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+

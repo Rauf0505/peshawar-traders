@@ -14,6 +14,14 @@ export const metadata: Metadata = {
   description:
     "Premium airguns, tactical vests, pouches, pellets, and field-tested outdoor equipment. Built for the wild. Trusted for life.",
   authors: [{ name: "Peshawar Traders" }],
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
   openGraph: {
     title: "Peshawar Traders",
     description:

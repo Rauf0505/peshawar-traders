@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/site/Header";
@@ -286,7 +287,7 @@ export function CheckoutPage() {
                       <div key={item.sku} className="flex gap-3">
                         <div className="size-14 shrink-0 rounded overflow-hidden bg-background">
                           {item.images[0] && (
-                            <img src={item.images[0]} alt={item.name} className="h-full w-full object-cover" />
+                            <Image src={item.images[0]} alt={item.name} width={56} height={56} className="h-full w-full object-cover" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">

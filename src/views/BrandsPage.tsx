@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Header } from "@/components/site/Header";
@@ -117,7 +118,7 @@ export function BrandsPage({ brands }: Props) {
                                 </div>
                                 <div>
                                   {brand.logo && (
-                                    <img src={brand.logo} alt={`${brand.name} logo`} className="h-8 object-contain mb-3" />
+                                    <Image src={brand.logo} alt={`${brand.name} logo`} width={160} height={32} className="h-8 object-contain mb-3" />
                                   )}
                                   <h3 className="text-white font-display text-xl font-semibold leading-tight">{brand.name}</h3>
                                   <p className="text-white/60 text-xs mt-1">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -37,7 +38,7 @@ export function CartDrawer() {
                 <div key={item.sku} className="flex gap-3 bg-secondary/40 rounded-md p-3">
                   <div className="size-20 shrink-0 rounded-md overflow-hidden bg-background">
                     {item.images[0] && (
-                      <img src={item.images[0]} alt={item.name} className="h-full w-full object-cover" />
+                      <Image src={item.images[0]} alt={item.name} width={80} height={80} className="h-full w-full object-cover" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -53,6 +54,7 @@ export function CartDrawer() {
                       <div className="flex items-center border border-border rounded">
                         <button
                           onClick={() => updateQuantity(item.sku, item.quantity - 1)}
+                          aria-label={`Decrease quantity of ${item.name}`}
                           className="grid place-items-center h-7 w-7 hover:bg-muted transition"
                         >
                           <Minus className="h-3 w-3" />
@@ -60,6 +62,7 @@ export function CartDrawer() {
                         <span className="w-8 text-center text-xs font-medium">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.sku, item.quantity + 1)}
+                          aria-label={`Increase quantity of ${item.name}`}
                           className="grid place-items-center h-7 w-7 hover:bg-muted transition"
                         >
                           <Plus className="h-3 w-3" />
@@ -67,6 +70,7 @@ export function CartDrawer() {
                       </div>
                       <button
                         onClick={() => removeItem(item.sku)}
+                        aria-label={`Remove ${item.name} from cart`}
                         className="text-muted-foreground hover:text-destructive transition"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShoppingBag, Menu, X, ChevronDown, Globe, Tag, Grid3X3, Home, Info, Phone, MapPin } from "lucide-react";
@@ -162,7 +163,7 @@ export function Header() {
         <div className="container-x flex h-20 items-center justify-between gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
-            <img src={LOGO_IMG} alt="Peshawar Traders" className="h-16 w-auto" />
+            <Image src={LOGO_IMG} alt="Peshawar Traders" width={80} height={40} className="h-16 w-auto" />
           </Link>
 
           {/* Desktop Nav */}
@@ -334,7 +335,7 @@ export function Header() {
             >
               {/* Header */}
               <div className="flex items-center justify-between px-5 h-20 border-b border-border">
-                <img src={LOGO_IMG} alt="Peshawar Traders" className="h-12 w-auto" />
+                <Image src={LOGO_IMG} alt="Peshawar Traders" width={80} height={40} className="h-12 w-auto" />
                 <button
                   onClick={() => setMobileOpen(false)}
                   className="h-10 w-10 grid place-items-center rounded-full hover:bg-muted transition"

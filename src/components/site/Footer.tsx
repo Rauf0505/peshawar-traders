@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Facebook, Instagram, Youtube, Twitter } from "lucide-react";
 const LOGO_IMG = "https://ik.imagekit.io/chaudaryrauf/wildwood/site/logo_FQb_afTiw.png";
 
@@ -13,21 +14,25 @@ export function Footer() {
       <div className="container-x pt-20 pb-10">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10">
           <div className="col-span-2">
-            <img src={LOGO_IMG} alt="Peshawar Traders" className="h-24 w-auto mb-6" />
+            <Image src={LOGO_IMG} alt="Peshawar Traders" width={192} height={96} className="h-24 w-auto mb-6" />
             <p className="text-sm leading-relaxed max-w-sm">
               Premium tactical and outdoor equipment for those who refuse to compromise.
               Family owned, three generations strong.
             </p>
             <div className="mt-8 flex gap-3">
-              {[Instagram, Facebook, Youtube, Twitter].map((I, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="grid h-10 w-10 place-items-center rounded-full border border-white/15 hover:bg-accent hover:border-accent hover:text-accent-foreground transition"
-                >
-                  <I className="h-4 w-4" />
-                </a>
-              ))}
+              {[Instagram, Facebook, Youtube, Twitter].map((I, i) => {
+                const labels = ["Instagram", "Facebook", "YouTube", "Twitter"];
+                return (
+                  <a
+                    key={i}
+                    href="#"
+                    aria-label={labels[i]}
+                    className="grid h-10 w-10 place-items-center rounded-full border border-white/15 hover:bg-accent hover:border-accent hover:text-accent-foreground transition"
+                  >
+                    <I className="h-4 w-4" />
+                  </a>
+                );
+              })}
             </div>
           </div>
           {cols.map((c) => (

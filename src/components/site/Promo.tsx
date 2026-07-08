@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 const PROMO_IMG = "https://ik.imagekit.io/chaudaryrauf/wildwood/site/promo_oZDWG3OTK.jpg";
@@ -46,7 +47,7 @@ export function Promo() {
   return (
     <section className="relative py-24 md:py-32 overflow-hidden">
       <div className="absolute inset-0">
-        <img src={PROMO_IMG} alt="" loading="lazy" className="h-full w-full object-cover" />
+        <Image src={PROMO_IMG} alt="" fill sizes="100vw" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/70 to-charcoal/40" />
       </div>
       <div className="relative container-x">

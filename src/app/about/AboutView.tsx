@@ -1,5 +1,4 @@
-"use client";
-
+import Image from "next/image";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ShieldCheck, Users, Globe, Award } from "lucide-react";
@@ -55,11 +54,12 @@ export default function AboutView() {
               <Reveal>
                 <div className="grid md:grid-cols-2 gap-10 items-center">
                   <div>
-                    <img
+                    <Image
                       src="https://ik.imagekit.io/chaudaryrauf/wildwood/site/about-hero_t8dKGCUiK.jpg"
                       alt="Our workshop"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="rounded-md w-full h-auto object-cover"
-                      loading="lazy"
                     />
                   </div>
                   <div>

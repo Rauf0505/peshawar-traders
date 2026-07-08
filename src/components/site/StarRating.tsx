@@ -25,6 +25,7 @@ export function StarRating({
           key={star}
           type="button"
           disabled={!interactive}
+          aria-label={`${star} star${star === 1 ? "" : "s"}`}
           onClick={() => interactive && onChange && onChange(star)}
           onMouseEnter={() => interactive && setHovered(star)}
           onMouseLeave={() => interactive && setHovered(0)}

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { Categories } from "@/components/site/Categories";
@@ -10,6 +11,12 @@ import { Newsletter } from "@/components/site/Newsletter";
 import { Footer } from "@/components/site/Footer";
 import { getCategories } from "@/lib/api/products.server";
 import { getHomePageProducts } from "@/lib/api/home-assignments.server";
+
+export const metadata: Metadata = {
+  title: "Peshawar Traders — Premium Tactical & Outdoor Gear",
+  description:
+    "Premium airguns, tactical vests, pouches, pellets, and field-tested outdoor equipment from top brands like Snowpeak, Hatsan, and Artemis. Built for the wild. Trusted for life.",
+};
 
 export const dynamic = "force-dynamic";
 

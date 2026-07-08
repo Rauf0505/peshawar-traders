@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Header } from "@/components/site/Header";
@@ -19,9 +20,11 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
     <div className="space-y-3">
       {/* Main image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-secondary border border-border">
-        <img
+        <Image
           src={images[selected]}
           alt={name}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="h-full w-full object-cover transition-opacity duration-300"
         />
       </div>
@@ -40,7 +43,7 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
               }`}
               style={{ width: 60, height: 60 }}
             >
-              <img src={img} alt="" className="h-full w-full object-cover" />
+              <Image src={img} alt="" width={60} height={60} className="h-full w-full object-cover" />
             </button>
           ))}
         </div>

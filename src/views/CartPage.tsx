@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
 import { Header } from "@/components/site/Header";
@@ -58,7 +59,7 @@ export function CartPage() {
                         className="size-24 shrink-0 rounded-md overflow-hidden bg-background"
                       >
                         {item.images[0] && (
-                          <img src={item.images[0]} alt={item.name} className="h-full w-full object-cover" />
+                          <Image src={item.images[0]} alt={item.name} width={96} height={96} className="h-full w-full object-cover" />
                         )}
                       </Link>
                       <div className="flex-1 min-w-0 flex flex-col justify-between">

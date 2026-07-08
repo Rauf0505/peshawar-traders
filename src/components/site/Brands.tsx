@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Reveal } from "./Reveal";
@@ -55,7 +56,7 @@ export function Brands() {
               >
                 <div className="aspect-square rounded-xl bg-secondary border border-border/60 hover:border-primary transition-all duration-300 flex flex-col items-center justify-center p-6 text-center">
                   {b.logo ? (
-                    <img src={b.logo} alt={b.name} className="h-10 object-contain mb-3 grayscale group-hover:grayscale-0 transition-all duration-500" />
+                    <Image src={b.logo} alt={b.name} width={160} height={40} className="h-10 object-contain mb-3 grayscale group-hover:grayscale-0 transition-all duration-500" />
                   ) : (
                     <span className="text-3xl mb-2">{COUNTRY_CODE[b.country] ? getFlagEmoji(COUNTRY_CODE[b.country]) : "🌐"}</span>
                   )}

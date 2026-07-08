@@ -1,8 +1,12 @@
-"use client";
-
+import type { Metadata } from "next";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Mail } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Contact Us — Peshawar Traders",
+  description: "Get in touch with Peshawar Traders. We reply within 24-48 hours.",
+};
 
 export default function ContactPage() {
   return (
@@ -19,7 +23,12 @@ export default function ContactPage() {
               wholesale options? Fill the form below and we will get back to you within 24-48 hours.
             </p>
 
-            <form className="mt-10 space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <form
+              className="mt-10 space-y-6"
+              action="mailto:info@peshawartraders.com"
+              method="GET"
+              encType="text/plain"
+            >
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-medium mb-1">
@@ -27,6 +36,7 @@ export default function ContactPage() {
                   </label>
                   <input
                     type="text"
+                    name="firstName"
                     id="firstName"
                     required
                     className="w-full border border-border rounded-md px-4 py-2 bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition"
@@ -38,6 +48,7 @@ export default function ContactPage() {
                   </label>
                   <input
                     type="text"
+                    name="lastName"
                     id="lastName"
                     required
                     className="w-full border border-border rounded-md px-4 py-2 bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition"
@@ -50,6 +61,7 @@ export default function ContactPage() {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   id="email"
                   required
                   className="w-full border border-border rounded-md px-4 py-2 bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition"
@@ -60,6 +72,7 @@ export default function ContactPage() {
                   Message
                 </label>
                 <textarea
+                  name="message"
                   id="message"
                   rows={5}
                   required

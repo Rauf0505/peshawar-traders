@@ -64,7 +64,7 @@ export default function AdminLayout({
         }
       })
       .catch(() => setAuthed(false));
-  }, []);
+  }, [pathname]);
 
   if (isLoginPage) {
     return <>{children}</>;

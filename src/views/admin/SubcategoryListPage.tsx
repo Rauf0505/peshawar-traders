@@ -54,11 +54,11 @@ export function SubcategoryListPage() {
         data: {
           token: getToken(),
           id: sub.id,
-          categoryId: sub.category_id,
+          categoryId: sub.categoryId,
           name: sub.name,
           slug: sub.slug,
           description: sub.description || "",
-          displayOrder: sub.display_order || 0,
+          displayOrder: sub.displayOrder || 0,
           status: sub.status === 1 ? 0 : 1,
         },
       });
@@ -70,7 +70,7 @@ export function SubcategoryListPage() {
   };
 
   const filtered = filterCat
-    ? subcategories.filter((s) => s.category_id === filterCat)
+    ? subcategories.filter((s) => s.categoryId === filterCat)
     : subcategories;
 
   const catName = (id: number) => categories.find((c) => c.id === id)?.name ?? "Unknown";
@@ -138,9 +138,9 @@ export function SubcategoryListPage() {
                       <span className="font-medium text-zinc-100">{sub.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-zinc-400">{catName(sub.category_id)}</td>
+                  <td className="px-4 py-3 text-zinc-400">{catName(sub.categoryId)}</td>
                   <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{sub.slug}</td>
-                  <td className="px-4 py-3 text-zinc-400">{sub.display_order}</td>
+                  <td className="px-4 py-3 text-zinc-400">{sub.displayOrder}</td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => toggleStatus(sub)}

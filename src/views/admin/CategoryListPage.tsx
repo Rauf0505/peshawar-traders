@@ -51,7 +51,7 @@ export function CategoryListPage() {
           name: cat.name,
           slug: cat.slug,
           description: cat.description || "",
-          displayOrder: cat.display_order || 0,
+          displayOrder: cat.displayOrder || 0,
           status: cat.status === 1 ? 0 : 1,
         },
       });
@@ -113,8 +113,8 @@ export function CategoryListPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-zinc-500 font-mono text-xs">{cat.slug}</td>
-                  <td className="px-4 py-3 text-zinc-400">{cat.display_order}</td>
-                  <td className="px-4 py-3 text-zinc-400">{cat.product_count ?? 0}</td>
+                  <td className="px-4 py-3 text-zinc-400">{cat.displayOrder}</td>
+                  <td className="px-4 py-3 text-zinc-400">{cat.productCount ?? 0}</td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => toggleStatus(cat)}

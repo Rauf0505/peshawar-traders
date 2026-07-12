@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { uploadProductImage, uploadBrandImage, deleteProductImage } from "@/lib/api/upload.server";
+import { uploadProductImage, uploadBrandImage, uploadHeroImage, deleteProductImage } from "@/lib/api/upload.server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +8,8 @@ export async function POST(req: NextRequest) {
     let result;
     if (type === "brand") {
       result = await uploadBrandImage({ data });
+    } else if (type === "hero") {
+      result = await uploadHeroImage({ data });
     } else {
       result = await uploadProductImage({ data });
     }

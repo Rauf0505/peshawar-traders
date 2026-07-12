@@ -297,6 +297,48 @@ export async function reorderHomeAssignments({ data }: { data: any }) {
   });
 }
 
+// ─── Hero ──────────────────────────────────────────────────────
+
+export async function getHeroSlides() {
+  return apiFetch("/api/hero");
+}
+
+export async function getAdminHeroSlides() {
+  return apiFetch("/api/admin/hero");
+}
+
+export async function createHeroSlide({ data }: { data: any }) {
+  return apiFetch("/api/admin/hero", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateHeroSlide({ data }: { data: any }) {
+  return apiFetch(`/api/admin/hero/${data.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteHeroSlide({ data }: { data: { token: string; id: number } }) {
+  return apiFetch(`/api/admin/hero/${data.id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: data.token }),
+  });
+}
+
+export async function reorderHeroSlides({ data }: { data: { token: string; slides: { id: number; slideOrder: number }[] } }) {
+  return apiFetch("/api/admin/hero/reorder", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
 // ─── Upload ────────────────────────────────────────────────────
 
 export async function uploadProductImage({ data }: { data: { token: string; base64: string; fileName: string; folder?: string } }) {
@@ -315,10 +357,134 @@ export async function uploadBrandImage({ data }: { data: { token: string; base64
   });
 }
 
+export async function uploadHeroImage({ data }: { data: { token: string; base64: string; fileName: string; folder?: string } }) {
+  return apiFetch("/api/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...data, type: "hero" }),
+  });
+}
+
 export async function deleteProductImage({ data }: { data: { token: string; fileId: string } }) {
   return apiFetch("/api/upload", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
+  });
+}
+
+// ─── Attributes ─────────────────────────────────────────────────
+
+export async function getAttributes() {
+  return apiFetch("/api/admin/attributes");
+}
+
+export async function getAttributeById({ data }: { data: { id: number } }) {
+  return apiFetch(`/api/admin/attributes/${data.id}`);
+}
+
+export async function createAttribute({ data }: { data: any }) {
+  return apiFetch("/api/admin/attributes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateAttribute({ data }: { data: any }) {
+  return apiFetch(`/api/admin/attributes/${data.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteAttribute({ data }: { data: { token: string; id: number } }) {
+  return apiFetch(`/api/admin/attributes/${data.id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: data.token }),
+  });
+}
+
+export async function getAttributeOptions({ data }: { data: { attributeId: number } }) {
+  return apiFetch(`/api/admin/attributes/options?attributeId=${data.attributeId}`);
+}
+
+export async function createAttributeOption({ data }: { data: any }) {
+  return apiFetch("/api/admin/attributes/options", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateAttributeOption({ data }: { data: any }) {
+  return apiFetch(`/api/admin/attributes/options/${data.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteAttributeOption({ data }: { data: { token: string; id: number } }) {
+  return apiFetch(`/api/admin/attributes/options/${data.id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: data.token }),
+  });
+}
+
+export async function getCategoryAttributes({ data }: { data: { categoryId: number } }) {
+  return apiFetch(`/api/admin/category-attributes?categoryId=${data.categoryId}`);
+}
+
+export async function setCategoryAttributes({ data }: { data: any }) {
+  return apiFetch("/api/admin/category-attributes", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+// ─── Variants ──────────────────────────────────────────────────────
+
+export async function getProductVariants({ data }: { data: { productId: number } }) {
+  return apiFetch(`/api/admin/products/variants?productId=${data.productId}`);
+}
+
+export async function getVariantById({ data }: { data: { id: number } }) {
+  return apiFetch(`/api/admin/products/variants/${data.id}`);
+}
+
+export async function createProductVariant({ data }: { data: any }) {
+  return apiFetch("/api/admin/products/variants", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateProductVariant({ data }: { data: any }) {
+  return apiFetch(`/api/admin/products/variants/${data.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteProductVariant({ data }: { data: { token: string; id: number } }) {
+  return apiFetch(`/api/admin/products/variants/${data.id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: data.token }),
+  });
+}
+
+export async function uploadAttributeImage({ data }: { data: { token: string; base64: string; fileName: string } }) {
+  return apiFetch("/api/upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...data, type: "attribute" }),
   });
 }

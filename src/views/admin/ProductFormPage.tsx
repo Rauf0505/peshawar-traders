@@ -11,6 +11,12 @@ import {
   getProducts,
   getBrands,
   uploadProductImage,
+  getCategoryAttributes,
+  getAttributeOptions,
+  getProductVariants,
+  createProductVariant,
+  updateProductVariant,
+  deleteProductVariant,
 } from "@/lib/api-client";
 import { Upload, Loader2, ChevronUp, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -27,10 +33,6 @@ interface FormData {
   description: string;
   price: number;
   comparePrice: string;
-  weight: string;
-  material: string;
-  dimensions: string;
-  color: string;
   brand: string;
   brandId: number;
   stockStatus: string;
@@ -44,6 +46,7 @@ interface FormData {
   metaDescription: string;
   features: string[];
   images: string[];
+  attributes: Record<string, string>;
 }
 
 const emptyForm: FormData = {
@@ -52,10 +55,6 @@ const emptyForm: FormData = {
   description: "",
   price: 0,
   comparePrice: "",
-  weight: "",
-  material: "",
-  dimensions: "",
-  color: "",
   brand: "",
   brandId: 0,
   stockStatus: "In Stock",
@@ -69,6 +68,7 @@ const emptyForm: FormData = {
   metaDescription: "",
   features: [],
   images: [],
+  attributes: {},
 };
 
 interface ProductFormPageProps {
@@ -89,7 +89,105 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [categoryAttrs, setCategoryAttrs] = useState<any[]>([]);
+  const [attrOptions, setAttrOptions] = useState<Record<number, any[]>>({});
+  const [variants, setVariants] = useState<any[]>([]);
+  const [showVariantForm, setShowVariantForm] = useState(false);
+  const [editVariantId, setEditVariantId] = useState<number | null>(null);
+  const [variantForm, setVariantForm] = useState<{ skuSuffix: string; priceOverride: string; optionIds: number[]; images: string[] }>({
+    skuSuffix: "", priceOverride: "", optionIds: [], images: [],
+  });
+  const [variantImgUploading, setVariantImgUploading] = useState(false);
+  const variantFileRef = useRef<HTMLInputElement>(null);
+
   const isEdit = editId !== undefined && editId > 0;
+  const variantAttrs = categoryAttrs.filter((ca: any) => ca.attribute.isVariantDefining === 1);
+
+  const handleVariantImgUpload = async (file: File) => {
+    setVariantImgUploading(true);
+    try {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const result = await uploadProductImage({
+        data: { token: getToken(), base64, fileName: file.name, folder: `products/${form.sku || "new"}/variants` },
+      });
+      setVariantForm((f) => ({ ...f, images: [...f.images, result.url] }));
+    } catch (err: any) {
+      toast.error(err.message || "Variant image upload failed");
+    } finally {
+      setVariantImgUploading(false);
+      if (variantFileRef.current) variantFileRef.current.value = "";
+    }
+  };
+
+  const resetVariantForm = () => {
+    setVariantForm({ skuSuffix: "", priceOverride: "", optionIds: [], images: [] });
+    setEditVariantId(null);
+    setShowVariantForm(false);
+  };
+
+  const saveVariant = async () => {
+    const pid = editId;
+    if (!pid) { toast.error("Save the product first, then add variants"); return; }
+    try {
+      const payload = {
+        token: getToken(),
+        productId: pid,
+        skuSuffix: variantForm.skuSuffix,
+        priceOverride: variantForm.priceOverride ? Number(variantForm.priceOverride) : undefined,
+        images: variantForm.images,
+        optionIds: variantForm.optionIds,
+      };
+      if (editVariantId) {
+        await updateProductVariant({ data: { ...payload, id: editVariantId } });
+      } else {
+        await createProductVariant({ data: payload });
+      }
+      const updated = await getProductVariants({ data: { productId: pid } });
+      setVariants(updated);
+      resetVariantForm();
+      toast.success(editVariantId ? "Variant updated" : "Variant created");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save variant");
+    }
+  };
+
+  const deleteVariant = async (id: number) => {
+    if (!confirm("Delete this variant?")) return;
+    await deleteProductVariant({ data: { token: getToken(), id } });
+    setVariants((prev) => prev.filter((v) => v.id !== id));
+    toast.success("Variant deleted");
+  };
+
+  const editVariant = (v: any) => {
+    setVariantForm({
+      skuSuffix: v.skuSuffix || "",
+      priceOverride: v.priceOverride ? String(v.priceOverride) : "",
+      optionIds: v.options.map((o: any) => o.attributeOptionId),
+      images: v.images || [],
+    });
+    setEditVariantId(v.id);
+    setShowVariantForm(true);
+  };
+
+  useEffect(() => {
+    if (!form.categoryId) { setCategoryAttrs([]); return; }
+    getCategoryAttributes({ data: { categoryId: form.categoryId } }).then((rows: any[]) => {
+      setCategoryAttrs(rows);
+      rows.forEach((r: any) => {
+        const attr = r.attribute;
+        if (attr.type === "select" || attr.type === "color_swatch") {
+          getAttributeOptions({ data: { attributeId: attr.id } }).then((opts: any[]) => {
+            setAttrOptions((prev) => ({ ...prev, [attr.id]: opts }));
+          });
+        }
+      });
+    });
+  }, [form.categoryId]);
 
   const clearFieldError = (field: string) => setFieldErrors((prev) => ({ ...prev, [field]: "" }));
 
@@ -113,6 +211,7 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
 
   useEffect(() => {
     if (isEdit && editId) {
+      getProductVariants({ data: { productId: editId } }).then(setVariants);
       getProductByDbId({ data: { id: editId } }).then((p) => {
         if (!p) return;
         setForm({
@@ -121,10 +220,6 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
           description: p.description || "",
           price: p.price || 0,
           comparePrice: p.comparePrice ? String(p.comparePrice) : "",
-          weight: p.weight || "",
-          material: p.material || "",
-          dimensions: p.dimensions || "",
-          color: p.color || "",
           brand: p.brand || "",
           brandId: p.brandId || 0,
           stockStatus: p.stockStatus || "In Stock",
@@ -138,6 +233,7 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
           metaDescription: p.metaDescription || "",
           features: p.features || [],
           images: p.images || [],
+          attributes: p.attributes || {},
         });
         setLoading(false);
       });
@@ -147,7 +243,7 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
   const inputCls = (field: string) => `w-full h-10 px-3 bg-zinc-900 border ${fieldErrors[field] ? "border-red-500" : "border-zinc-800"} rounded-md text-sm text-zinc-100 focus:outline-none ${fieldErrors[field] ? "focus:border-red-400" : "focus:border-emerald-500"} transition`;
 
   const filteredSubs = subcategories.filter(
-    (s: any) => s.category_id === form.categoryId,
+    (s: any) => s.categoryId === form.categoryId,
   );
 
   const update = (field: keyof FormData, value: any) =>
@@ -221,10 +317,6 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
         description: form.description,
         price: form.price,
         comparePrice: form.comparePrice ? Number(form.comparePrice) : undefined,
-        weight: form.weight,
-        material: form.material,
-        dimensions: form.dimensions,
-        color: form.color,
         brand: form.brand,
         brandId: form.brandId || undefined,
         stockStatus: form.stockStatus,
@@ -237,6 +329,7 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
         categoryId: form.categoryId,
         subcategoryId: form.subcategoryId,
         images: form.images.filter(Boolean),
+        attributes: form.attributes,
         rating: form.rating,
       };
 
@@ -301,26 +394,7 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-1.5">Weight</label>
-            <input value={form.weight} onChange={(e) => update("weight", e.target.value)} className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition" />
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-1.5">Material</label>
-            <input value={form.material} onChange={(e) => update("material", e.target.value)} className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition" />
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-1.5">Dimensions</label>
-            <input value={form.dimensions} onChange={(e) => update("dimensions", e.target.value)} className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-1.5">Color</label>
-            <input value={form.color} onChange={(e) => update("color", e.target.value)} className="w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition" />
-          </div>
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-1.5">Brand</label>
             <select value={form.brandId} onChange={(e) => {
@@ -382,6 +456,56 @@ export function ProductFormPage({ editId }: ProductFormPageProps) {
             </label>
           </div>
         </div>
+
+        {categoryAttrs.length > 0 && (
+          <div className="border border-zinc-800 rounded-lg p-5">
+            <h3 className="text-sm font-medium text-zinc-100 mb-4">Product Attributes</h3>
+            <div className="space-y-4">
+              {categoryAttrs.map((ca: any) => {
+                const attr = ca.attribute;
+                const val = form.attributes[String(attr.id)] || "";
+                const options = attrOptions[attr.id] || [];
+                const cls = "w-full h-10 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-sm text-zinc-100 focus:outline-none focus:border-emerald-500 transition";
+
+                const setVal = (v: string) =>
+                  setForm((f) => ({ ...f, attributes: { ...f.attributes, [String(attr.id)]: v } }));
+
+                return (
+                  <div key={attr.id}>
+                    <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-1.5">
+                      {attr.name}
+                      {attr.isVariantDefining === 1 && <span className="text-emerald-400 ml-1.5">(variant)</span>}
+                    </label>
+                    {attr.type === "color_swatch" ? (
+                      <div className="flex flex-wrap gap-2">
+                        {options.map((opt: any) => {
+                          const hex = opt.meta ? JSON.parse(opt.meta).hex : "#ccc";
+                          const selected = val === opt.value;
+                          return (
+                            <button key={opt.id} type="button" onClick={() => setVal(selected ? "" : opt.value)}
+                              className={`w-9 h-9 rounded-full border-2 transition ${selected ? "border-emerald-400 ring-2 ring-emerald-400/30" : "border-zinc-700 hover:border-zinc-500"}`}
+                              style={{ backgroundColor: hex }}
+                              title={opt.value}
+                            />
+                          );
+                        })}
+                      </div>
+                    ) : attr.type === "select" ? (
+                      <select value={val} onChange={(e) => setVal(e.target.value)} className={cls}>
+                        <option value="">Select {attr.name}</option>
+                        {options.map((opt: any) => (
+                          <option key={opt.id} value={opt.value}>{opt.value}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input value={val} onChange={(e) => setVal(e.target.value)} className={cls} placeholder={`Enter ${attr.name}`} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-1.5">Features</label>

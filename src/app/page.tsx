@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/site/Header";
-import { Hero } from "@/components/site/Hero";
+import { Hero, type Slide } from "@/components/site/Hero";
+import { getHeroSlides } from "@/lib/api/hero.server";
 import { Categories } from "@/components/site/Categories";
 import { Products } from "@/components/site/Products";
 import { Promo } from "@/components/site/Promo";
@@ -23,6 +24,7 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   let categories: any[] = [];
   let initialProducts: any[] = [];
+  let heroSlides: Slide[] = [];
   try {
     categories = await getCategories();
   } catch (err) {
@@ -33,12 +35,17 @@ export default async function HomePage() {
   } catch (err) {
     console.error("Failed to load initial products:", err);
   }
+  try {
+    heroSlides = await getHeroSlides();
+  } catch (err) {
+    console.error("Failed to load hero slides:", err);
+  }
 
   return (
     <div className="bg-background text-foreground overflow-x-hidden">
       <Header />
       <main className="pt-20">
-        <Hero />
+        <Hero slides={heroSlides} />
         <Categories categories={categories} />
         <Products initialProducts={initialProducts} />
         <Promo />

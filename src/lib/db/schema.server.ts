@@ -83,10 +83,6 @@ export const products = pgTable("products", {
   price: real("price").notNull(),
   comparePrice: real("compare_price"),
   costPrice: real("cost_price"),
-  weight: text("weight"),
-  material: text("material"),
-  dimensions: text("dimensions"),
-  color: text("color"),
   brand: text("brand"),
   brandId: integer("brand_id"),
   stockStatus: text("stock_status").default("In Stock"),
@@ -99,6 +95,7 @@ export const products = pgTable("products", {
   categoryId: integer("category_id"),
   subcategoryId: integer("subcategory_id"),
   images: text("images"),
+  attributes: text("attributes"),
   rating: real("rating").default(0),
   createdAt: text("created_at").default(sql`current_timestamp`),
   updatedAt: text("updated_at").default(sql`current_timestamp`),
@@ -136,6 +133,79 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   createdAt: text("created_at").default(sql`current_timestamp`),
 });
+
+export const heroSlides = pgTable("hero_slides", {
+  id: serial("id").primaryKey(),
+  slideOrder: integer("slide_order").notNull().default(0),
+  mediaType: text("media_type").notNull().default("image"),
+  mediaUrl: text("media_url").notNull(),
+  eyebrowText: text("eyebrow_text"),
+  headingLine1: text("heading_line1"),
+  headingLine2: text("heading_line2"),
+  description: text("description"),
+  button1Text: text("button1_text"),
+  button1Link: text("button1_link"),
+  button2Text: text("button2_text"),
+  button2Link: text("button2_link"),
+  duration: integer("duration").default(5),
+  videoMuted: integer("video_muted").default(1),
+  showScrollIndicator: integer("show_scroll_indicator").default(1),
+  isActive: integer("is_active").default(1),
+  createdAt: text("created_at").default(sql`current_timestamp`),
+  updatedAt: text("updated_at").default(sql`current_timestamp`),
+});
+
+export const attributes = pgTable("attributes", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  type: text("type").notNull().default("text"),
+  isVariantDefining: integer("is_variant_defining").default(0),
+  sortOrder: integer("sort_order").default(0),
+});
+
+export const attributeOptions = pgTable("attribute_options", {
+  id: serial("id").primaryKey(),
+  attributeId: integer("attribute_id").notNull().references(() => attributes.id),
+  value: text("value").notNull(),
+  meta: text("meta"),
+  sortOrder: integer("sort_order").default(0),
+});
+
+export const categoryAttributes = pgTable(
+  "category_attributes",
+  {
+    categoryId: integer("category_id").notNull().references(() => categories.id),
+    attributeId: integer("attribute_id").notNull().references(() => attributes.id),
+    required: integer("required").default(0),
+    sortOrder: integer("sort_order").default(0),
+    showInFilter: integer("show_in_filter").default(0),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.categoryId, t.attributeId] }),
+  }),
+);
+
+export const productVariants = pgTable("product_variants", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id").notNull().references(() => products.id),
+  skuSuffix: text("sku_suffix"),
+  priceOverride: real("price_override"),
+  images: text("images"),
+  sortOrder: integer("sort_order").default(0),
+  isActive: integer("is_active").default(1),
+});
+
+export const productVariantOptions = pgTable(
+  "product_variant_options",
+  {
+    variantId: integer("variant_id").notNull().references(() => productVariants.id),
+    attributeOptionId: integer("attribute_option_id").notNull().references(() => attributeOptions.id),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.variantId, t.attributeOptionId] }),
+  }),
+);
 
 export const productReviews = pgTable("product_reviews", {
   id: serial("id").primaryKey(),

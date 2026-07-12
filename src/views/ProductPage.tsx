@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -16,9 +16,10 @@ import { getProductReviews } from "@/lib/api-client";
 function ImageGallery({ images, name }: { images: string[]; name: string }) {
   const [selected, setSelected] = useState(0);
 
+  useEffect(() => { setSelected(0); }, [images]);
+
   return (
     <div className="space-y-3">
-      {/* Main image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-secondary border border-border">
         <Image
           src={images[selected]}
@@ -29,7 +30,6 @@ function ImageGallery({ images, name }: { images: string[]; name: string }) {
         />
       </div>
 
-      {/* Thumbnails */}
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {images.map((img, i) => (
@@ -58,6 +58,60 @@ export function ProductPage({ product }: { product: any }) {
   const [reviews, setReviews] = useState<any[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
 
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, string>>({});
+
+  const variants = product.variants || [];
+
+  const varDefAttrs = useMemo(() => {
+    const seen: Record<number, { id: number; name: string; type: string }> = {};
+    for (const v of variants) {
+      for (const opt of v.options) {
+        if (!seen[opt.attributeId] && opt.attributeType !== "text") {
+          seen[opt.attributeId] = { id: opt.attributeId, name: opt.attributeName, type: opt.attributeType };
+        }
+      }
+    }
+    return Object.values(seen);
+  }, [variants]);
+
+  const uniqueOptions = useMemo(() => {
+    const map: Record<number, { value: string; meta: string | null }[]> = {};
+    for (const v of variants) {
+      for (const opt of v.options) {
+        if (!map[opt.attributeId]) map[opt.attributeId] = [];
+        if (!map[opt.attributeId].some((o) => o.value === opt.value)) {
+          map[opt.attributeId].push({ value: opt.value, meta: opt.meta });
+        }
+      }
+    }
+    return map;
+  }, [variants]);
+
+  const selectedVariant = useMemo(() => {
+    const keys = Object.keys(selectedOptions);
+    if (keys.length === 0 || keys.length !== varDefAttrs.length) return null;
+    return variants.find((v: any) =>
+      v.options.every((o: any) => selectedOptions[o.attributeId] === o.value)
+    ) || null;
+  }, [selectedOptions, variants, varDefAttrs]);
+
+  const displayImages = selectedVariant?.images?.length ? selectedVariant.images : product.images;
+  const displayPrice = selectedVariant?.priceOverride ?? product.price;
+  const displaySku = selectedVariant?.skuSuffix ? `${product.sku}-${selectedVariant.skuSuffix}` : product.sku;
+
+  useEffect(() => {
+    if (varDefAttrs.length > 0 && variants.length > 0) {
+      const initial: Record<number, string> = {};
+      for (const attr of varDefAttrs) {
+        const vals = uniqueOptions[attr.id];
+        if (vals && vals.length > 0) {
+          initial[attr.id] = vals[0].value;
+        }
+      }
+      setSelectedOptions(initial);
+    }
+  }, [varDefAttrs.length, variants.length]);
+
   const fetchReviews = useCallback(async () => {
     try {
       setReviewsLoading(true);
@@ -80,7 +134,7 @@ export function ProductPage({ product }: { product: any }) {
       : product.rating ?? 0;
 
   const handleAddToCart = () => {
-    addItem(product, qty);
+    addItem({ ...product, price: displayPrice, sku: displaySku, images: displayImages }, qty);
     toast.success(`${product.name} added to cart`, {
       action: { label: "View Cart", onClick: () => openCart() },
     });
@@ -100,6 +154,16 @@ export function ProductPage({ product }: { product: any }) {
       ? "bg-red-500"
       : "bg-purple-400";
 
+  const categoryAttrMap = useMemo(() => {
+    const m: Record<string, { name: string; type: string }> = {};
+    (product.categoryAttributes || []).forEach((ca: any) => {
+      m[String(ca.attribute.id)] = { name: ca.attribute.name, type: ca.attribute.type };
+    });
+    return m;
+  }, [product.categoryAttributes]);
+
+  const attrEntries = Object.entries(product.attributes || {}) as [string, string][];
+
   return (
     <div className="bg-background text-foreground">
       <Header />
@@ -107,7 +171,6 @@ export function ProductPage({ product }: { product: any }) {
         <section className="py-8 md:py-20">
           <div className="container-x">
 
-            {/* Breadcrumb */}
             <Link
               href="/products"
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition mb-6"
@@ -116,28 +179,22 @@ export function ProductPage({ product }: { product: any }) {
               Back to Products
             </Link>
 
-            {/* Main grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
 
-              {/* ── Left: Gallery ── */}
-              <ImageGallery images={product.images} name={product.name} />
+              <ImageGallery images={displayImages} name={product.name} />
 
-              {/* ── Right: Info ── */}
               <div className="flex flex-col">
 
-                {/* Category */}
                 {product.subcategory && (
                   <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-2">
                     {product.subcategory}
                   </p>
                 )}
 
-                {/* Name */}
                 <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.08]">
                   {product.name}
                 </h1>
 
-                {/* Rating */}
                 <div className="flex items-center gap-2 mt-3">
                   <StarRating rating={avgRating} size={14} />
                   <span className="text-xs text-muted-foreground ml-1">
@@ -147,10 +204,9 @@ export function ProductPage({ product }: { product: any }) {
                   </span>
                 </div>
 
-                {/* Price row */}
                 <div className="flex flex-wrap items-baseline gap-3 mt-4">
                   <span className="text-2xl sm:text-3xl font-bold text-foreground">
-                    Rs.{product.price?.toLocaleString()}
+                    Rs.{displayPrice?.toLocaleString()}
                   </span>
                   {product.comparePrice && (
                     <>
@@ -166,15 +222,61 @@ export function ProductPage({ product }: { product: any }) {
                   )}
                 </div>
 
-                {/* Divider */}
                 <div className="border-t border-border mt-5 mb-5" />
 
-                {/* Description */}
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                   {product.description}
                 </p>
 
-                {/* Stock status */}
+                {varDefAttrs.length > 0 && (
+                  <div className="mt-5 space-y-3">
+                    {varDefAttrs.map((attr) => {
+                      const vals = uniqueOptions[attr.id] || [];
+                      const current = selectedOptions[attr.id];
+                      return (
+                        <div key={attr.id}>
+                          <label className="block text-xs font-medium text-muted-foreground mb-1.5">{attr.name}</label>
+                          {attr.type === "color_swatch" ? (
+                            <div className="flex flex-wrap gap-2">
+                              {vals.map((v) => {
+                                let hex = "#ccc";
+                                try { if (v.meta) hex = JSON.parse(v.meta).hex || hex; } catch { console.debug("color meta parse"); }
+                                return (
+                                  <button
+                                    key={v.value}
+                                    type="button"
+                                    onClick={() => setSelectedOptions((prev) => ({ ...prev, [attr.id]: v.value }))}
+                                    className={`w-9 h-9 rounded-full border-2 transition ${current === v.value ? "border-foreground ring-2 ring-foreground/30" : "border-border hover:border-muted-foreground/60"}`}
+                                    style={{ backgroundColor: hex }}
+                                    title={v.value}
+                                  />
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="flex flex-wrap gap-2">
+                              {vals.map((v) => (
+                                <button
+                                  key={v.value}
+                                  type="button"
+                                  onClick={() => setSelectedOptions((prev) => ({ ...prev, [attr.id]: v.value }))}
+                                  className={`px-3 h-8 text-xs font-medium rounded-md border transition ${
+                                    current === v.value
+                                      ? "bg-primary text-primary-foreground border-primary"
+                                      : "bg-transparent text-muted-foreground border-border hover:border-muted-foreground/60"
+                                  }`}
+                                >
+                                  {v.value}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 mt-5">
                   <span className={`h-2 w-2 rounded-full ${stockDot}`} />
                   <span className={`text-sm font-medium ${stockColor}`}>
@@ -187,7 +289,6 @@ export function ProductPage({ product }: { product: any }) {
                   </span>
                 </div>
 
-                {/* CTA — full width on mobile */}
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
                   {product.stockStatus === "On Demand" ? (
                     <a
@@ -201,7 +302,6 @@ export function ProductPage({ product }: { product: any }) {
                     </a>
                   ) : (
                     <>
-                      {/* Qty picker */}
                       <div className="flex items-center border border-border rounded-md overflow-hidden self-stretch sm:self-auto">
                         <button
                           onClick={() => setQty(Math.max(1, qty - 1))}
@@ -218,7 +318,6 @@ export function ProductPage({ product }: { product: any }) {
                         </button>
                       </div>
 
-                      {/* Add to cart */}
                       <button
                         onClick={handleAddToCart}
                         disabled={product.stockStatus === "Out of Stock"}
@@ -231,19 +330,18 @@ export function ProductPage({ product }: { product: any }) {
                   )}
                 </div>
 
-                {/* Product details */}
                 <div className="mt-8 border-t border-border pt-6">
                   <h3 className="text-xs font-semibold uppercase tracking-[0.18em] mb-4 text-foreground">
                     Product Details
                   </h3>
                   <dl className="grid grid-cols-2 gap-y-4 gap-x-4 text-sm">
                     {[
-                      { label: "SKU", value: product.sku },
-                      { label: "Brand", value: product.brand },
-                      { label: "Material", value: product.material },
-                      { label: "Weight", value: product.weight },
-                      { label: "Dimensions", value: product.dimensions },
-                      { label: "Color", value: product.color },
+                      { label: "SKU", value: displaySku },
+                      { label: "Brand", value: product.brandName || product.brand },
+                      ...attrEntries.map(([attrId, val]) => {
+                        const info = categoryAttrMap[attrId];
+                        return { label: info?.name || `Attribute ${attrId}`, value: val };
+                      }),
                     ]
                       .filter((d) => d.value)
                       .map((d) => (
@@ -257,7 +355,6 @@ export function ProductPage({ product }: { product: any }) {
                   </dl>
                 </div>
 
-                {/* Features */}
                 {product.features?.length > 0 && (
                   <div className="mt-6 border-t border-border pt-6">
                     <h3 className="text-xs font-semibold uppercase tracking-[0.18em] mb-4 text-foreground">
@@ -276,7 +373,6 @@ export function ProductPage({ product }: { product: any }) {
               </div>
             </div>
 
-            {/* Product Reviews Section */}
             <ProductReviews
               productId={product.id}
               reviews={reviews}
@@ -291,4 +387,3 @@ export function ProductPage({ product }: { product: any }) {
     </div>
   );
 }
-

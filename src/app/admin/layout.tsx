@@ -15,6 +15,8 @@ import {
   List,
   ShoppingCart,
   MessageSquare,
+  Image,
+  ListOrdered,
 } from "lucide-react";
 
 function getToken(): string | null {
@@ -29,6 +31,8 @@ const navItems = [
   { href: "/admin/brands", label: "Brands", icon: Tag },
   { href: "/admin/categories", label: "Categories", icon: Grid3X3 },
   { href: "/admin/subcategories", label: "Subcategories", icon: List },
+  { href: "/admin/hero", label: "Hero", icon: Image },
+  { href: "/admin/attributes", label: "Attributes", icon: ListOrdered },
   { href: "/admin/home-control", label: "Home Control", icon: Home },
   { href: "/admin/reviews", label: "Reviews", icon: MessageSquare },
 ];

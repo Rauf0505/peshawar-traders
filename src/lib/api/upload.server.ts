@@ -20,6 +20,12 @@ export async function uploadBrandImage({ data }: { data: any }) {
     return result;
   }
 
+export async function uploadHeroImage({ data }: { data: any }) {
+    requireAuth(data.token);
+    const result = await ikUpload(data.base64, data.fileName, data.folder ?? "hero");
+    return result;
+  }
+
 export async function deleteProductImage({ data }: { data: any }) {
     requireAuth(data.token);
     await ikDelete(data.fileId);

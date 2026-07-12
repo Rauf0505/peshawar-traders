@@ -72,11 +72,11 @@ export function SubcategoryFormPage({ editId }: Props) {
         const sub = subs.find((s: any) => s.id === editId);
         if (sub) {
           setForm({
-            categoryId: sub.category_id,
+            categoryId: sub.categoryId,
             name: sub.name,
             slug: sub.slug,
             description: sub.description || "",
-            displayOrder: sub.display_order || 0,
+            displayOrder: sub.displayOrder || 0,
             status: sub.status ?? 1,
           });
           setSlugManuallyEdited(true);

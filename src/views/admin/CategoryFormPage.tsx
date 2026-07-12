@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createCategory, updateCategory, getCategories } from "@/lib/api-client";
+import { createCategory, updateCategory, getCategories, getAttributes, getCategoryAttributes, setCategoryAttributes } from "@/lib/api-client";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 function getToken(): string {
   return typeof window !== "undefined" ? localStorage.getItem("admin_token") || "" : "";
@@ -42,6 +44,12 @@ export function CategoryFormPage({ editId }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
+  const [allAttributes, setAllAttributes] = useState<any[]>([]);
+  const [categoryAttributeIds, setCategoryAttributeIds] = useState<Set<number>>(new Set());
+  const [attributeSettings, setAttributeSettings] = useState<Record<number, { sortOrder: number; showInFilter: number }>>({});
+  const [loadingAttributes, setLoadingAttributes] = useState(false);
+  const [attributesInitialized, setAttributesInitialized] = useState(false);
+
   const isEdit = !!editId;
 
   const clearFieldError = (field: string) => setFieldErrors((prev) => ({ ...prev, [field]: "" }));
@@ -64,7 +72,7 @@ export function CategoryFormPage({ editId }: Props) {
             name: cat.name,
             slug: cat.slug,
             description: cat.description || "",
-            displayOrder: cat.display_order || 0,
+            displayOrder: cat.displayOrder || 0,
             status: cat.status ?? 1,
           });
           setSlugManuallyEdited(true);
@@ -73,6 +81,47 @@ export function CategoryFormPage({ editId }: Props) {
       });
     }
   }, [editId]);
+
+  useEffect(() => {
+    if (attributesInitialized) return;
+    getAttributes().then((attrs: any[]) => {
+      setAllAttributes(attrs);
+      if (isEdit && editId) {
+        getCategoryAttributes({ data: { categoryId: editId } }).then((assigned: any[]) => {
+          const ids = new Set<number>();
+          const settings: Record<number, { sortOrder: number; showInFilter: number }> = {};
+          assigned.forEach((a: any) => {
+            ids.add(a.attributeId);
+            settings[a.attributeId] = { sortOrder: a.sortOrder ?? 0, showInFilter: a.showInFilter ?? 0 };
+          });
+          setCategoryAttributeIds(ids);
+          setAttributeSettings(settings);
+          setLoadingAttributes(false);
+        });
+      }
+      setAttributesInitialized(true);
+      setLoadingAttributes(false);
+    });
+  }, [isEdit, editId, attributesInitialized]);
+
+  const toggleAttribute = (attrId: number) => {
+    setCategoryAttributeIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(attrId)) next.delete(attrId);
+      else next.add(attrId);
+      return next;
+    });
+    if (!attributeSettings[attrId]) {
+      setAttributeSettings((prev) => ({ ...prev, [attrId]: { sortOrder: 0, showInFilter: 0 } }));
+    }
+  };
+
+  const updateAttrSetting = (attrId: number, field: "sortOrder" | "showInFilter", value: number) => {
+    setAttributeSettings((prev) => ({
+      ...prev,
+      [attrId]: { ...prev[attrId], [field]: value },
+    }));
+  };
 
   const update = (field: keyof FormData, value: any) => {
     setForm((f) => {
@@ -90,11 +139,27 @@ export function CategoryFormPage({ editId }: Props) {
     if (!validate()) return;
     setSaving(true);
     try {
+      let catId: number;
       if (isEdit) {
         await updateCategory({ data: { token: getToken(), id: editId!, ...form } });
+        catId = editId!;
       } else {
-        await createCategory({ data: { token: getToken(), ...form } });
+        const result = await createCategory({ data: { token: getToken(), ...form } });
+        catId = result.id;
       }
+
+      await setCategoryAttributes({
+        data: {
+          token: getToken(),
+          categoryId: catId,
+          assignments: Array.from(categoryAttributeIds).map((attrId) => ({
+            attributeId: attrId,
+            sortOrder: attributeSettings[attrId]?.sortOrder ?? 0,
+            showInFilter: attributeSettings[attrId]?.showInFilter ?? 0,
+          })),
+        },
+      });
+
       toast.success(isEdit ? "Category updated successfully" : "Category created successfully");
       router.push("/admin/categories");
     } catch (err: any) {
@@ -175,6 +240,63 @@ export function CategoryFormPage({ editId }: Props) {
               <option value={0}>Disabled</option>
             </select>
           </div>
+        </div>
+
+        <div className="border border-zinc-800 rounded-lg p-5">
+          <h3 className="text-sm font-medium text-zinc-100 mb-4">Category Attributes</h3>
+          <p className="text-xs text-zinc-500 mb-4">Assign attributes that products in this category can have.</p>
+          {loadingAttributes ? (
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading attributes…
+            </div>
+          ) : allAttributes.length === 0 ? (
+            <p className="text-xs text-zinc-600">No attributes defined yet. <Link href="/admin/attributes/new" className="text-emerald-400 hover:underline">Create one</Link>.</p>
+          ) : (
+            <div className="space-y-2">
+              {allAttributes.map((attr) => {
+                const assigned = categoryAttributeIds.has(attr.id);
+                const settings = attributeSettings[attr.id];
+                return (
+                  <div key={attr.id} className="flex items-center gap-3 p-2 rounded hover:bg-zinc-900/50 transition">
+                    <input
+                      type="checkbox"
+                      checked={assigned}
+                      onChange={() => toggleAttribute(attr.id)}
+                      className="accent-emerald-500"
+                      id={`attr-${attr.id}`}
+                    />
+                    <label htmlFor={`attr-${attr.id}`} className="flex-1 text-sm text-zinc-300 cursor-pointer">
+                      {attr.name}
+                      <span className="text-xs text-zinc-600 ml-2">({attr.type})</span>
+                    </label>
+                    {assigned && (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs text-zinc-500">Order</label>
+                          <input
+                            type="number"
+                            min={0}
+                            value={settings?.sortOrder ?? 0}
+                            onChange={(e) => updateAttrSetting(attr.id, "sortOrder", Number(e.target.value))}
+                            className="w-16 h-8 px-2 bg-zinc-900 border border-zinc-800 rounded text-xs text-zinc-100 focus:outline-none focus:border-emerald-500 transition"
+                          />
+                        </div>
+                        <label className="flex items-center gap-1.5 text-xs text-zinc-500 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={settings?.showInFilter === 1}
+                            onChange={(e) => updateAttrSetting(attr.id, "showInFilter", e.target.checked ? 1 : 0)}
+                            className="accent-emerald-500"
+                          />
+                          Filter
+                        </label>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {error && <p className="text-sm text-red-400 bg-red-950/50 px-3 py-2 rounded-md">{error}</p>}

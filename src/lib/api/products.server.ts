@@ -9,6 +9,7 @@ import {
   homeAssignments,
 } from "../db/schema.server";
 import { verifyToken } from "./auth.server";
+import { getProductVariants, getCategoryAttributesInclude, getAttributes } from "./attributes.server";
 
 function requireAuth(token: string) {
   const user = verifyToken(token);
@@ -34,10 +35,6 @@ function flattenProduct(row: {
     price: p.price,
     comparePrice: p.comparePrice ?? null,
     costPrice: p.costPrice ?? null,
-    weight: p.weight ?? "",
-    material: p.material ?? "",
-    dimensions: p.dimensions ?? "",
-    color: p.color ?? "",
     brand: p.brand ?? "",
     brandId: p.brandId ?? null,
     brandName: b?.name ?? null,
@@ -49,6 +46,7 @@ function flattenProduct(row: {
     featured: !!(p.featured),
     rating: p.rating ?? 0,
     features: JSON.parse(p.features || "[]"),
+    attributes: JSON.parse(p.attributes || "{}"),
     metaTitle: p.metaTitle ?? "",
     metaDescription: p.metaDescription ?? "",
     images: JSON.parse(p.images || "[]"),
@@ -95,7 +93,23 @@ export async function getProductById({ data }: { data: any }) {
       .leftJoin(brands, eq(products.brandId, brands.id))
       .where(eq(products.sku, data.id))
       .limit(1);
-    return rows.length > 0 ? flattenProduct(rows[0]) : null;
+    if (rows.length === 0) return null;
+    const flat = flattenProduct(rows[0]);
+    const variants = await getProductVariants(flat.id);
+    let categoryAttributes: any[] = [];
+    if (flat.categoryId) {
+      try {
+        categoryAttributes = await getCategoryAttributesInclude(flat.categoryId);
+      } catch { /* ignore */ }
+    }
+    if (categoryAttributes.length === 0) {
+      const all = await getAttributes();
+      const attrIds = Object.keys(flat.attributes || {}).map(Number);
+      categoryAttributes = all
+        .filter((a: any) => attrIds.includes(a.id))
+        .map((a: any) => ({ attribute: { id: a.id, name: a.name, type: a.type, isVariantDefining: a.isVariantDefining } }));
+    }
+    return { ...flat, variants, categoryAttributes };
   }
 
 export async function getProductByDbId({ data }: { data: any }) {
@@ -174,10 +188,6 @@ export async function createProduct({ data }: { data: any }) {
         sku: data.sku,
         price: data.price,
         comparePrice: data.comparePrice ?? null,
-        weight: data.weight ?? "",
-        material: data.material ?? "",
-        dimensions: data.dimensions ?? "",
-        color: data.color ?? "",
         brand: data.brand ?? "",
         brandId: data.brandId ?? null,
         stockStatus: data.stockStatus ?? "In Stock",
@@ -185,6 +195,7 @@ export async function createProduct({ data }: { data: any }) {
         visibility: data.visibility ? 1 : 0,
         featured: data.featured ? 1 : 0,
         features: JSON.stringify(data.features ?? []),
+        attributes: JSON.stringify(data.attributes ?? {}),
         metaTitle: data.metaTitle ?? "",
         metaDescription: data.metaDescription ?? "",
         categoryId: data.categoryId ?? null,
@@ -209,10 +220,6 @@ export async function updateProduct({ data }: { data: any }) {
         sku: data.sku,
         price: data.price,
         comparePrice: data.comparePrice ?? null,
-        weight: data.weight ?? "",
-        material: data.material ?? "",
-        dimensions: data.dimensions ?? "",
-        color: data.color ?? "",
         brand: data.brand ?? "",
         brandId: data.brandId ?? null,
         stockStatus: data.stockStatus ?? "In Stock",
@@ -220,6 +227,7 @@ export async function updateProduct({ data }: { data: any }) {
         visibility: data.visibility ? 1 : 0,
         featured: data.featured ? 1 : 0,
         features: JSON.stringify(data.features ?? []),
+        attributes: JSON.stringify(data.attributes ?? {}),
         metaTitle: data.metaTitle ?? "",
         metaDescription: data.metaDescription ?? "",
         categoryId: data.categoryId ?? null,

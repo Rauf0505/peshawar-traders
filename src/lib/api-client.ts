@@ -27,6 +27,14 @@ export async function verifyAuth({ data }: { data: { token: string } }) {
   });
 }
 
+export async function changePassword({ data }: { data: { token: string; currentPassword: string; newPassword: string } }) {
+  return apiFetch("/api/auth/change-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
 // ─── Orders ────────────────────────────────────────────────────
 
 export async function getOrders({ data }: { data: { token: string } }) {

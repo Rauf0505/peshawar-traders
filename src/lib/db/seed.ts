@@ -1,11 +1,9 @@
 import { getDb } from "./connection.server";
 import { users, categories, subcategories, brands, products, homeAssignments } from "./schema.server";
-import { getServerConfig } from "../config.server";
 import { eq } from "drizzle-orm";
 
 async function seed() {
   const db = await getDb();
-  const config = getServerConfig();
 
   const [existingUser] = await db
     .select({ id: users.id })
@@ -18,11 +16,12 @@ async function seed() {
 
   const { scryptSync, randomBytes } = await import("node:crypto");
   const salt = randomBytes(16).toString("hex");
-  const hash = scryptSync(config.adminPassword, salt, 64).toString("hex");
+  const hash = scryptSync("admin123", salt, 64).toString("hex");
   await db.insert(users).values({
-    username: config.adminUsername,
+    username: "admin",
     passwordHash: `${salt}:${hash}`,
   });
+  console.log("Default admin user created (admin / admin123). Change your password in the admin panel.");
 
   const categoriesData = [
     {

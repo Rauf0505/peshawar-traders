@@ -70,3 +70,30 @@ export async function verifyAuth({ data }: { data: any }) {
     const result = verifyToken(data.token);
     return { valid: !!result, username: result?.username ?? null };
   }
+
+export async function changePassword({ data }: { data: any }) {
+    const tokenData = verifyToken(data.token);
+    if (!tokenData) throw new Error("Unauthorized");
+
+    const db = await getDb();
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, tokenData.username))
+      .limit(1);
+
+    if (!user || !verifyPassword(data.currentPassword, user.passwordHash)) {
+      throw new Error("Current password is incorrect");
+    }
+
+    const { scryptSync, randomBytes } = await import("node:crypto") as typeof import("node:crypto");
+    const salt = randomBytes(16).toString("hex");
+    const hash = scryptSync(data.newPassword, salt, 64).toString("hex");
+
+    await db
+      .update(users)
+      .set({ passwordHash: `${salt}:${hash}` })
+      .where(eq(users.id, user.id));
+
+    return { success: true };
+  }

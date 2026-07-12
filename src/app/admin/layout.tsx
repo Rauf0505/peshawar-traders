@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Image,
   ListOrdered,
+  Settings,
 } from "lucide-react";
 
 function getToken(): string | null {
@@ -33,6 +34,7 @@ const navItems = [
   { href: "/admin/subcategories", label: "Subcategories", icon: List },
   { href: "/admin/hero", label: "Hero", icon: Image },
   { href: "/admin/attributes", label: "Attributes", icon: ListOrdered },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/home-control", label: "Home Control", icon: Home },
   { href: "/admin/reviews", label: "Reviews", icon: MessageSquare },
 ];
